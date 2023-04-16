@@ -4,9 +4,11 @@ import math
 import sys
 from matplotlib import pyplot as plt
 import numpy as np
+#sys.path.append('..\\src\\trueskillplus\\')
+sys.path.append('..')
 
-
-from trueskill import Rating, rate_1vs1, TrueSkill
+import trueskillplus
+import trueskill
 
 ratings = {}
 mu_values = {}
@@ -62,18 +64,7 @@ x = []
 y = []
 
 # prepare TS1 env
-env = TrueSkill(draw_probability=0)
-env.make_as_global()
-
-
-def win_probability(team1, team2):
-    
-    delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
-    sum_sigma = sum(r.sigma ** 2 for r in itertools.chain(team1, team2))
-    size = len(team1) + len(team2)
-    denom = math.sqrt(size * (env.beta * env.beta) + sum_sigma)
-
-    return env.cdf(delta_mu / denom)
+env = trueskillplus.Trueskillplus(draw_probability=0)
 
 is_bestof = []
 kdr_diff = []
@@ -82,10 +73,10 @@ kdr_diff = []
 for index, row in df.iterrows():
     x.append(index)
     if row['team_1'] not in ratings:
-        r = ratings[row['team_1']] = Rating()
+        r = ratings[row['team_1']] = trueskill.Rating()
 
     if row['team_2'] not in ratings:
-        r = ratings[row['team_2']] = Rating()
+        r = ratings[row['team_2']] = trueskill.Rating()
 
     if row['t1_points'] + row['t2_points'] < 16 :
         is_bestof.append(True)
@@ -102,13 +93,13 @@ predictions = []
 probabilities = []
 for index, row in df.iterrows():
 
-    p = win_probability([ratings[row['team_1']]], [ratings[row['team_2']]]) #put it into team format as well
+    p = trueskillplus.win_probability([ratings[row['team_1']]], [ratings[row['team_2']]]) #put it into team format as well
     predictions.append('t1') if p > 0.5 else predictions.append('t2')
     probabilities.append(p)
 
     if (row['winner'] == 't1'):
 
-        t1_new_rating, t2_new_rating = rate_1vs1(
+        t1_new_rating, t2_new_rating = trueskillplus.rate_1vs1(
             ratings[row['team_1']], ratings[row['team_2']])
 
         ratings[row['team_1']] = t1_new_rating
@@ -116,7 +107,7 @@ for index, row in df.iterrows():
 
     elif (row['winner'] == 't2'):
 
-        t2_new_rating, t1_new_rating = rate_1vs1(
+        t2_new_rating, t1_new_rating = trueskillplus.rate_1vs1(
             ratings[row['team_2']], ratings[row['team_1']])
 
         ratings[row['team_1']] = t1_new_rating
