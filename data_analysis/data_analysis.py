@@ -4,16 +4,17 @@ import math
 import sys
 from matplotlib import pyplot as plt
 import numpy as np
-#sys.path.append('..\\src\\trueskillplus\\')
 sys.path.append('..')
 
-import trueskillplus
+
+from src import trueskillplus
 import trueskill
 
 ratings = {}
 mu_values = {}
 # pro csgo games from 2016-2020
 # source: https://www.kaggle.com/datasets/gabrieltardochi/counter-strike-global-offensive-matches?resource=download
+
 
 #TODO: convert from t1-t2 to winner-loser format so placement of teams isnt relevant
 
@@ -93,13 +94,13 @@ predictions = []
 probabilities = []
 for index, row in df.iterrows():
 
-    p = trueskillplus.win_probability([ratings[row['team_1']]], [ratings[row['team_2']]]) #put it into team format as well
+    p = env.win_probability(team1=[ratings[row['team_1']]], team2=[ratings[row['team_2']]]) #put it into team format as well
     predictions.append('t1') if p > 0.5 else predictions.append('t2')
     probabilities.append(p)
 
     if (row['winner'] == 't1'):
 
-        t1_new_rating, t2_new_rating = trueskillplus.rate_1vs1(
+        t1_new_rating, t2_new_rating = env.rate_1vs1(
             ratings[row['team_1']], ratings[row['team_2']])
 
         ratings[row['team_1']] = t1_new_rating
@@ -107,7 +108,7 @@ for index, row in df.iterrows():
 
     elif (row['winner'] == 't2'):
 
-        t2_new_rating, t1_new_rating = trueskillplus.rate_1vs1(
+        t2_new_rating, t1_new_rating = env.rate_1vs1(
             ratings[row['team_2']], ratings[row['team_1']])
 
         ratings[row['team_1']] = t1_new_rating

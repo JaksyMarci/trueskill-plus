@@ -6,8 +6,8 @@ import itertools
 #no ranks, no draws
 class Trueskillplus():
     def __init__(self, stat_coeff = 1, draw_probability=0):
-        env = trueskill.TrueSkill(draw_probability=0)
-        env.make_as_global()
+        self.env = trueskill.TrueSkill(draw_probability=0)
+        self.env.make_as_global()
         #todo: give env the following
         #stat coeff: difference from the expected * how much should be the new sigma?
         #default 1 -> new sigma is sigma + abs(stat_diff - expected_stat_diff) 
@@ -83,9 +83,10 @@ class Trueskillplus():
             r1_stat_diff = abs(r1_stats-r1_predicted_stats) * self.stat_coeff
             r2_stat_diff = abs(r2_stats-r2_predicted_stats) * self.stat_coeff
 
+            
             rating1.sigma = rating1.sigma + r1_stat_diff
             rating2.sigma = rating2.sigma + r2_stat_diff
         
         
         #add experience_offset to ratings here
-        trueskill.rate_1vs1(rating1, rating2)
+        return trueskill.rate_1vs1(rating1, rating2)
