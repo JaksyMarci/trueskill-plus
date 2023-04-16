@@ -1,6 +1,7 @@
 import trueskill
 import tensorflow as tf
-
+import math
+import itertools
 
 #no ranks, no draws
 class Trueskill_plus():
@@ -8,6 +9,14 @@ class Trueskill_plus():
         env = trueskill.TrueSkill()
         env.make_as_global()
 
+    def win_probability(self, team1, team2):
+    
+        delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
+        sum_sigma = sum(r.sigma ** 2 for r in itertools.chain(team1, team2))
+        size = len(team1) + len(team2)
+        denom = math.sqrt(size * (self.env.beta * self.env.beta) + sum_sigma)
+
+        return self.env.cdf(delta_mu / denom)
 
     def rate(rating_groups, points = None, stats = None, model: tf.keras.Model = None):
         #put code here
@@ -51,8 +60,10 @@ class Trueskill_plus():
         trueskill.rate(rating_groups, ranks=None, weights=None, min_delta=0.0001)
     
     def rate_1vs1(rating1, rating2, points = None, stats = None, model: tf.keras.Model = None):
+        #ratings would get switched around if one team had more points.
         #model should have columns!
-
+        #t1 is the winner always here.
+        
         if points:
             t1_points = points[0]
             t2_points = points[1]
@@ -60,7 +71,15 @@ class Trueskill_plus():
             t1_stats = stats[0]
             t2_stats = stats[1]
         
+        if t1_points > t2_points:
+            winner = 't1'
+        else:
+            winner = 't2'
+
         
+
+        stat_diff = t1_stats - t2_stats
+        pred_stat_diff = model.predict([winner, t1_points, t2_points, ])
         
 
 

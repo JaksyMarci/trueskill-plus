@@ -4,14 +4,16 @@ import math
 import sys
 from matplotlib import pyplot as plt
 import numpy as np
-sys.path.append("..")
 
-from trueskill import Rating, rate_1vs1, TrueSkill, rate_csgo
+
+from trueskill import Rating, rate_1vs1, TrueSkill
 
 ratings = {}
 mu_values = {}
 # pro csgo games from 2016-2020
 # source: https://www.kaggle.com/datasets/gabrieltardochi/counter-strike-global-offensive-matches?resource=download
+
+#TODO: convert from t1-t2 to winner-loser format so placement of teams isnt relevant
 
 df = pd.read_csv('csgo_games.csv')[['team_1', 'team_2', 'winner', 't1_points', 't2_points',
                                    't1_player1_kdr', 't1_player2_kdr', 't1_player3_kdr', 't1_player4_kdr', 't1_player5_kdr',
