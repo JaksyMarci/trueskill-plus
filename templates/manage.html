@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container">
+        <div class="col sidecolumn"></div>
+        <div class="col">
+            <nav class="navbar navbar-expand navbar-dark bg-dark">
+                <a class="navbar-brand" href="#"><h1>Trueskill-plus</h1></a>
+                <div class="collapse navbar-collapse" id="navbar">
+                    <ul class="navbar-nav mr-auto">
+                      <li class="nav-item">
+                        <a class="nav-link" href="main"> Home </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link active" href="manage">Settings</a>
+                      </li>
+                    </ul>
+                </div>
+            </nav>
+            <form method="POST">
+                <div class="form-group">
+                    <label for="beta">Beta value</label>
+                    <input type="number" min="0.0001" placeholder="4.1666" step="0.0001" class="form-control" id="beta" name="beta" required>
+                    <small class="form-text">The distance which guarantees about 76% chance of winning. The recommended value is a half of sigma.</small>
+                  </div>
+                  <div class="form-group">
+                    <label for="beta">Tau value</label>
+                    <input type="number" min="0.0001" max="0.9999" placeholder="0.0833" step="0.0001" class="form-control" id="tau" name="tau" required>
+                    <small class="form-text">The dynamic factor which restrains a fixation of rating. The recommended value is sigma per cent.</small>
+                  </div>
+                  <div class="form-group">
+                    <label for="draw_probability">Draw probability</label>
+                    <input type="number" min="0.0001" max="0.9999" placeholder="0.100" step="0.0001" class="form-control" id="draw_probability" name="draw_probability" required>
+                    <small class="form-text">The draw probability between two teams. If it is a float, the game has fixed draw probability. Otherwise, the draw probability will be decided dynamically per each match.</small>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+            
+            
+        </div>
+        <div class="col sidecolumn"></div>
+    </div>
+
+</body>
+</html>

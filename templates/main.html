@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<style>
+    body{
+        background-color: whitesmoke;
+    }
+</style>
+<body>
+    
+    <div class="container">
+        <div class="col sidecolumn"></div>
+        <div class="col">
+            <nav class="navbar navbar-expand navbar-dark bg-dark">
+                <a class="navbar-brand" href="#"><h1>Trueskill-plus</h1></a>
+                <div class="collapse navbar-collapse" id="navbar">
+                    <ul class="navbar-nav mr-auto">
+                      <li class="nav-item">
+                        <a class="nav-link active" href="main"> Home </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="manage">Settings</a>
+                      </li>
+                    </ul>
+                </div>
+            </nav>
+            
+            <img src="data:image/png;base64, {{ session['img'] }} "/>
+
+
+            {% for teamName, teamMembers in session['teams'].items() -%}
+        
+            <div class="container">
+                <div class="row">
+                    <form action="/remove_team" method="POST">
+                        <div class="col">
+                            
+                            <h2>{{teamName}} </h2>
+                            
+                        </div>
+                        <div class="col">
+                            
+                            <input type="submit" id="remove_team" class="btn btn-danger" value="Remove team">
+                            
+                        </div>
+                        
+                        
+                        
+                        <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
+                    </form>
+                </div>
+            </div>
+        
+        
+            <div class="form-group">
+                <form action="/add_player" method="POST" class="form-inline">
+                    <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
+                    <div class="row">
+                        
+                        <div class="col">
+                            <label for="playerName" class="form-label">Player name</label>
+                            <input type="text" class="form-control" id="playerName" name="playerName">
+                        </div>
+                        <div class="col">
+                            <label for="mu" class="form-label">Mu value</label>
+                            <input type="number" class="form-control" id="mu" value="25" name="mu">
+                        </div>
+                        <div class="col">
+                            <label for="sigma" class="form-label">Sigma value</label>
+                            <input type="number" class="form-control" id="sigma" value="8.33" name="sigma">
+                        </div>
+                        <div class="col">
+                            <label for="addPlayer" class="form-label"> </label>
+                            <input type="submit" id="addPlayer" class="form-control btn btn-primary" value="Add player">
+                        </div>
+                        
+                    </div>
+                    
+                    
+                    
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover align-middle">
+                    <thead class="table-primary">
+                        <th>Name</th>
+                        <th>Mu</th>
+                        <th>Sigma</th>
+                        <th></th>
+                    </thead>
+                    <tbody>
+                        
+                        {% for key, values in session['teams'][teamName].items() -%}
+                        <tr>
+                            <td> {{ key}} </td>
+                            <td> {{values['mu']}} </td>
+                            <td> {{values['sigma']}} </td>
+                            <td> <form action="/remove_player" method="post"  ><input type="hidden" name="playerName" value={{ key }}> <input type="submit" class="btn btn-outline-danger" value="Remove"></form> </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            
+            {%endfor%}
+
+
+            <form action="/add_team" method="POST">
+                <input type="text" name="teamName">
+                <button class=" btn btn-success">Add team</button>
+            </form>
+            <form action="/calculate" method="POST">
+                <button class="btn btn-outline-dark">Update ratings</button>
+            </form>
+        </div>
+        <div class="col"></div>
+    </div>
+    
+    
+    <img class="img-fluid" src='data:image/png;base64,{{ data }}'/>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+    
+
+</body>
+</html>
+
