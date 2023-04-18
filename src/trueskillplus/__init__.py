@@ -2,12 +2,15 @@ import trueskill
 import tensorflow as tf
 import math
 import itertools
+import sys
+
+sys.path.append('..')
+
 
 #no ranks, no draws
 class Trueskillplus():
     def __init__(self, stat_coeff = 1, draw_probability=0):
         self.env = trueskill.TrueSkill(draw_probability=0)
-        self.env.make_as_global()
         #todo: give env the following
         #stat coeff: difference from the expected * how much should be the new sigma?
         #default 1 -> new sigma is sigma + abs(stat_diff - expected_stat_diff) 
@@ -17,7 +20,7 @@ class Trueskillplus():
         #experience coeff (both add to mu)
         self.stat_coeff = stat_coeff
 
-    def win_probability(self, team1, team2):
+    def win_probability(self, team1, team2): #Szervezd ezt ki egy külön modulba, kapja az env-et paraméterkén
     
         delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
         sum_sigma = sum(r.sigma ** 2 for r in itertools.chain(team1, team2))
@@ -28,7 +31,7 @@ class Trueskillplus():
 
     def rate(rating_groups, points = None, stats = None, model: tf.keras.Model = None):
         #put code here
-
+        
         """
         
 
