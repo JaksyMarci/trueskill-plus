@@ -77,19 +77,16 @@ class Trueskillplus():
         #todo maybe move this over to rate_csgo
         
         
-        if stats and predicted_stats:
-            r1_stats = stats[0]
-            r2_stats = stats[1]
-            r1_predicted_stats = predicted_stats[0]
-            r2_predicted_stats = predicted_stats[1]
+        if stats is not None and predicted_stats is not None:
+            
 
-            r1_stat_diff = abs(r1_stats-r1_predicted_stats) * self.stat_coeff
-            r2_stat_diff = abs(r2_stats-r2_predicted_stats) * self.stat_coeff
+            stat_diff = abs(stats-predicted_stats)
+            
 
             
-            rating1.sigma = rating1.sigma + r1_stat_diff
-            rating2.sigma = rating2.sigma + r2_stat_diff
+            
         
-        
+        rating1 = trueskill.Rating(rating1.mu, rating1.sigma + stat_diff * self.stat_coeff)
+        rating2 = trueskill.Rating(rating2.mu, rating2.sigma + stat_diff * self.stat_coeff) #large diff means an upset happened, so sigma gets modified
         #add experience_offset to ratings here
         return trueskill.rate_1vs1(rating1, rating2)
