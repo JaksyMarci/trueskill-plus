@@ -162,10 +162,10 @@ print(
     f'Trueskill correctly predicts the outcome {percent_matches}% of the time.')
 
 
-df = df.tail(-1000)
+df_tail = df.tail(-1000)
 
-num_matches = sum(df['winner'] == df['predicted_winner'])
-total_rows = len(df)
+num_matches = sum(df_tail['winner'] == df_tail['predicted_winner'])
+total_rows = len(df_tail)
 percent_matches = num_matches / total_rows * 100
 # initial value: 58,546%
 print(
