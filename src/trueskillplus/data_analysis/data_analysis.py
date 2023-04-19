@@ -180,9 +180,11 @@ from trueskillplus.model import model
 ts_plus_model = model.train_csgo_model(df)
 
 plt.figure(figsize=[20, 5], dpi=400)
-x = []
+
 y = []
 
+predictions = []
+probabilities = []
 
 #TODO reusing the dataset is questionable
 
@@ -194,24 +196,24 @@ for index, row in df.iterrows():
 
     
     if (row['winner'] == 't1'):
-        x = np.array([ row['t1_points'], row['t2_points'], 1.0, 0.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0])
+        pred_array = np.array([ row['t1_points'], row['t2_points'], 1.0, 0.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0])
         t1_new_rating, t2_new_rating = ts_plus_env.rate_1vs1(
             rating1=ts_plus_ratings[row['team_1']], rating2=ts_plus_ratings[row['team_2']],
             stats=row['kdr_diff'],
-            predicted_stats=ts_plus_model(np.reshape(x, (1,6)))
+            predicted_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
             )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating
         ts_plus_ratings[row['team_2']] = t2_new_rating
 
     elif (row['winner'] == 't2'):
-        x= np.array([ row['t1_points'], row['t2_points'], 0.0, 1.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0])
+        pred_array= np.array([ row['t1_points'], row['t2_points'], 0.0, 1.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0])
         
         t2_new_rating, t1_new_rating = ts_plus_env.rate_1vs1(
             rating1=ts_plus_ratings[row['team_2']], 
             rating2=ts_plus_ratings[row['team_1']],
             stats=row['kdr_diff'],
-            predicted_stats=ts_plus_model(np.reshape(x, (1,6)))
+            predicted_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
             )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating
