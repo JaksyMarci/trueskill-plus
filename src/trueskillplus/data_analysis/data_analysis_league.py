@@ -1,14 +1,16 @@
 import pandas as pd
 import trueskill
-
+from matplotlib import pyplot as plt
 import os
 import sys
+import numpy as np
 #https://www.kaggle.com/datasets/chuckephron/leagueoflegends?select=LeagueofLegends.csv
 
 ts2_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..\\..'))
 sys.path.insert(0, ts2_dir)
 import trueskillplus
 
+#prepare data
 df = pd.read_csv('LeagueofLegends.csv')[['League', 'blueTeamTag', 'bResult', 'rResult',
        'redTeamTag', 'golddiff', 'bKills', 'bTowers',
        'bInhibs', 'bDragons', 'bBarons', 'bHeralds', 'rKills',
@@ -33,6 +35,7 @@ keep_values_2 = value_counts_2[value_counts_2 >= 30].index.tolist()
 df = df[df['blueTeamTag'].isin(keep_values_1)]
 df = df[df['redTeamTag'].isin(keep_values_2)]
 
+#prepare ratings
 ts_ratings = {}
 ts_plus_ratings = {}
 
@@ -44,6 +47,13 @@ ts_env = trueskill.TrueSkill(draw_probability=0)
 ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0)
 
 df['predicted_bResult'] = '?'
+
+#prepare graph
+x = np.arange(len(df))
+y = []
+label_list = []
+for key, value in ts_ratings.items():
+    label_list.append(key)
 
 for index, row in df.iterrows():
     b_win_prob = ts_plus_env.win_probability([ts_ratings[row['blueTeamTag']]], [ts_ratings[row['redTeamTag']]])
@@ -59,6 +69,15 @@ for index, row in df.iterrows():
         ts_ratings[row['redTeamTag']] = r_new_rating
         ts_ratings[row['blueTeamTag']] = b_new_rating
 
+    mu_list = []
+    for key, value in ts_ratings.items():
+        mu_list.append(value.mu)
+    y.append(mu_list)
+
+plt.figure()
+plt.plot(x, y, label=label_list)
+plt.savefig('NALCS_trueskill')
+
 
 num_matches = sum(df['bResult'] == df['predicted_bResult'])
 total_rows = len(df)
@@ -66,20 +85,6 @@ percent_matches = num_matches / total_rows * 100
 
 print(
     f'Trueskill correctly predicts the outcome {percent_matches}% of the time.')
-
-df_tail = df.tail(-200)
-
-num_matches = sum(df_tail['bResult'] == df_tail['predicted_bResult'])
-total_rows = len(df_tail)
-percent_matches = num_matches / total_rows * 100
-
-print(
-    f'After removing the first 200 matches and ratings converge, Trueskill correctly predicts the outcome {percent_matches}% of the time.')
-
-
-
-print(df.describe())
-print(df.head(10))
 
 
 
