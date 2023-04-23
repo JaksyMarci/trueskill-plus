@@ -161,7 +161,7 @@ for key, value in ts_ratings.items():
 plt.plot(x, y, label=label_list)
 plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-plt.savefig('image_ts')
+plt.savefig('csgo_trueskill')
 
 num_matches = sum(df['winner'] == df['predicted_winner'])
 total_rows = len(df)
@@ -248,7 +248,7 @@ for key, value in ts_plus_ratings.items():
 plt.plot(x, y, label=label_list)
 plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-plt.savefig('image_ts_plus')
+plt.savefig('csgo_trueskill_plus')
 
 num_matches = sum(df['winner'] == df['predicted_winner'])
 total_rows = len(df)
