@@ -184,10 +184,10 @@ plt.close()
 """
 Caluclate Trueskill plus ratings:
 """
-from trueskillplus.model import model_csgo
+from trueskillplus.model import game_model
 
 print(df.sample(5))
-ts_plus_model = model_csgo.train_csgo_model(df)
+ts_plus_model = game_model.train_csgo_model(df)
 
 plt.figure(figsize=[20, 5], dpi=400)
 

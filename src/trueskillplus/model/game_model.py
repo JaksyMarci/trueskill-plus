@@ -61,3 +61,31 @@ def train_csgo_model(df : pd.DataFrame):
 
     """
 
+def train_league_model(df : pd.DataFrame):
+    df = df[['golddiff','bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds']]
+   
+    X = df.drop(['golddiff'], axis=1).values
+    y = df[['golddiff']].values
+
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+
+    # Create a multilayer perceptron model with ReLU activation
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(32, activation='relu', input_shape=(14,)),
+        tf.keras.layers.Dense(32, activation='relu'),
+        tf.keras.layers.Dense(8, activation='relu'),
+        tf.keras.layers.Dense(1)
+    ])
+
+    # Compile the model with a mean squared error loss and Adam optimizer
+    model.compile(loss='mse', optimizer='adam')
+
+    # Fit the model on the training data
+    model.fit(X_train, y_train, epochs=50, batch_size=10, callbacks=tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3))
+
+    # Evaluate the model on the testing data
+    test_loss = model.evaluate(X_test, y_test)
+    print('Test loss:', test_loss)
+    return model
+    
