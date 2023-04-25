@@ -2,6 +2,7 @@ import tensorflow as tf
 import pandas as pd
 from sklearn.model_selection import train_test_split
 import numpy as np
+from matplotlib import pyplot as plt
 """
 Trains a predictive model used to guess scores based on past matches.
 """
@@ -62,7 +63,7 @@ def train_csgo_model(df : pd.DataFrame):
     """
 
 def train_league_model(df : pd.DataFrame):
-    df = df[['golddiff','bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds']]
+    df = df[['golddiff','bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds', 'bRating', 'rRating']].astype(float)
    
     X = df.drop(['golddiff'], axis=1).values
     y = df[['golddiff']].values
@@ -72,8 +73,8 @@ def train_league_model(df : pd.DataFrame):
 
     # Create a multilayer perceptron model with ReLU activation
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(32, activation='relu', input_shape=(14,)),
-        tf.keras.layers.Dense(32, activation='relu'),
+        tf.keras.layers.Dense(16, activation='relu', input_shape=(16,)),
+        tf.keras.layers.Dense(16, activation='relu'),
         tf.keras.layers.Dense(8, activation='relu'),
         tf.keras.layers.Dense(1)
     ])
@@ -83,6 +84,7 @@ def train_league_model(df : pd.DataFrame):
 
     # Fit the model on the training data
     model.fit(X_train, y_train, epochs=50, batch_size=10, callbacks=tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3))
+    
 
     # Evaluate the model on the testing data
     test_loss = model.evaluate(X_test, y_test)
