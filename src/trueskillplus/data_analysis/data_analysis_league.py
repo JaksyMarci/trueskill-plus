@@ -44,9 +44,11 @@ for tag in df['blueTeamTag'].unique():
     ts_plus_ratings[tag] = trueskill.Rating()
 
 ts_env = trueskill.TrueSkill(draw_probability=0)
-ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff = 0.0001)
+ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff = 0.00001)
 
 df['predicted_bResult'] = '?'
+df['bRating'] = '?'
+df['rRating'] = '?'
 
 #prepare graph
 x = np.arange(len(df))
@@ -57,7 +59,11 @@ for key, value in ts_ratings.items():
 
 for index, row in df.iterrows():
     b_win_prob = ts_plus_env.win_probability([ts_ratings[row['blueTeamTag']]], [ts_ratings[row['redTeamTag']]])
+    
     df.at[index, 'predicted_bResult'] = 1 if b_win_prob > 0.5 else 0
+    df.at[index, 'bRating'] = ts_ratings[row['blueTeamTag']].mu
+    df.at[index, 'rRating'] = ts_ratings[row['redTeamTag']].mu
+
     if row['bResult'] == 1:
         #blue win
         b_new_rating, r_new_rating = trueskill.rate_1vs1(ts_ratings[row['blueTeamTag']], ts_ratings[row['redTeamTag']])
@@ -110,20 +116,20 @@ for index, row in df.iterrows():
 
     df.at[index, 'predicted_bResult'] = 1 if b_win_prob > 0.5 else 0
 
-    pred_array = np.array(row[['bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds']]).astype(float)
+    pred_array = np.array(row[['bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds', 'bRating', 'rRating']]).astype(float)
     
     if row['bResult'] == 1:
         #blue win
         b_new_rating, r_new_rating = ts_plus_env.rate_1vs1(rating1=ts_plus_ratings[row['blueTeamTag']],rating2= ts_plus_ratings[row['redTeamTag']], 
                                                             stats=row['golddiff'],
-                                                            predicted_stats=model(np.reshape(pred_array, (1,14))))
+                                                            predicted_stats=model(np.reshape(pred_array, (1,16))))
         ts_plus_ratings[row['blueTeamTag']] = b_new_rating
         ts_plus_ratings[row['redTeamTag']] = r_new_rating
     else:
         #red win
         r_new_rating, b_new_rating = ts_plus_env.rate_1vs1(rating1=ts_plus_ratings[row['redTeamTag']],rating2= ts_plus_ratings[row['blueTeamTag']],
                                                             stats=row['golddiff'],
-                                                            predicted_stats=model(np.reshape(pred_array, (1,14))))
+                                                            predicted_stats=model(np.reshape(pred_array, (1,16))))
         ts_plus_ratings[row['redTeamTag']] = r_new_rating
         ts_plus_ratings[row['blueTeamTag']] = b_new_rating
 
