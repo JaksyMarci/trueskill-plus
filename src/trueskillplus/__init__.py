@@ -9,7 +9,7 @@ sys.path.append('..')
 
 #no ranks, no draws
 class Trueskillplus():
-    def __init__(self, stat_coeff = 1, draw_probability=0):
+    def __init__(self, stat_coeff = 0, draw_probability=0):
         self.env = trueskill.TrueSkill(draw_probability=0)
         #todo: give env the following
         #stat coeff: difference from the expected * how much should be the new sigma?
@@ -79,14 +79,20 @@ class Trueskillplus():
         
         if stats is not None and predicted_stats is not None:
             
-
+            rating_diff = abs(rating1.mu - rating2.mu)
             stat_diff = abs(stats-predicted_stats)
+            #we would need to know the relation between +1 rating <-> +how much stats. should be a 'hyperparamener'
+            #TODO ditch this if it doesnt perform well
+            #add coeffs for both values maybe?
+            stat_offset = (stat_diff / (rating_diff + 1)) *  self.stat_coeff
             
+        else:
+            stat_offset = 0
 
             
             
         
-        rating1 = trueskill.Rating(rating1.mu, rating1.sigma + stat_diff * self.stat_coeff)
-        rating2 = trueskill.Rating(rating2.mu, rating2.sigma + stat_diff * self.stat_coeff) #large diff means an upset happened, so sigma gets modified
+        rating1 = trueskill.Rating(rating1.mu, rating1.sigma + stat_offset)
+        rating2 = trueskill.Rating(rating2.mu, rating2.sigma + stat_offset) #large diff means an upset happened, so sigma gets modified
         #add experience_offset to ratings here
         return trueskill.rate_1vs1(rating1, rating2)
