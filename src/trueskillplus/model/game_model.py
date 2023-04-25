@@ -73,8 +73,8 @@ def train_league_model(df : pd.DataFrame):
 
     # Create a multilayer perceptron model with ReLU activation
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(16, activation='relu', input_shape=(14,)),
-        tf.keras.layers.Dense(16, activation='relu'),
+        tf.keras.layers.Dense(32, activation='relu', input_shape=(14,)),
+        tf.keras.layers.Dense(32, activation='relu'),
         tf.keras.layers.Dense(8, activation='relu'),
         tf.keras.layers.Dense(1)
     ])
@@ -83,7 +83,7 @@ def train_league_model(df : pd.DataFrame):
     model.compile(loss='mse', optimizer='adam')
 
     # Fit the model on the training data
-    model.fit(X_train, y_train, epochs=50, batch_size=10, callbacks=tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3))
+    model.fit(X_train, y_train, epochs=200, batch_size=10, callbacks=tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3))
     
 
     # Evaluate the model on the testing data

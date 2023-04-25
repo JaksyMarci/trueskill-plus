@@ -74,7 +74,7 @@ y = []
 
 # prepare TS env
 ts_env = trueskill.TrueSkill(draw_probability=0)
-ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff=0.003)
+ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff=0.5)
 
 ts_ratings = {}
 ts_plus_ratings = {}
