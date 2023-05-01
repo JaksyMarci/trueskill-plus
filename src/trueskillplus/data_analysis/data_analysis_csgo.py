@@ -205,7 +205,7 @@ for index, row in df.iterrows():
         t1_new_rating, t2_new_rating = ts_plus_env.rate_1vs1(
             rating1=ts_plus_ratings[row['team_1']], rating2=ts_plus_ratings[row['team_2']],
             stats=row['kdr_diff'],
-            predicted_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
+            expected_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
             )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating
@@ -219,7 +219,7 @@ for index, row in df.iterrows():
             rating1=ts_plus_ratings[row['team_2']], 
             rating2=ts_plus_ratings[row['team_1']],
             stats=row['kdr_diff'],
-            predicted_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
+            expected_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
             )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating

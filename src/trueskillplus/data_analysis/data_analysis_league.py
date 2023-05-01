@@ -128,14 +128,14 @@ for index, row in df.iterrows():
         #blue win
         b_new_rating, r_new_rating = ts_plus_env.rate_1vs1(rating1=ts_plus_ratings[row['blueTeamTag']],rating2= ts_plus_ratings[row['redTeamTag']], 
                                                             stats=row['golddiff'],
-                                                            predicted_stats=model(np.reshape(pred_array, (1,14))))
+                                                            expected_stats=model(np.reshape(pred_array, (1,14))))
         ts_plus_ratings[row['blueTeamTag']] = b_new_rating
         ts_plus_ratings[row['redTeamTag']] = r_new_rating
     else:
         #red win
         r_new_rating, b_new_rating = ts_plus_env.rate_1vs1(rating1=ts_plus_ratings[row['redTeamTag']],rating2= ts_plus_ratings[row['blueTeamTag']],
                                                             stats=row['golddiff'],
-                                                            predicted_stats=model(np.reshape(pred_array, (1,14))))
+                                                            expected_stats=model(np.reshape(pred_array, (1,14))))
         ts_plus_ratings[row['redTeamTag']] = r_new_rating
         ts_plus_ratings[row['blueTeamTag']] = b_new_rating
 
