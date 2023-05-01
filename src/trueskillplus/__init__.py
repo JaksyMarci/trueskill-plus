@@ -4,13 +4,23 @@ import math
 import itertools
 import sys
 
+from trueskill import BETA, DELTA, DRAW_PROBABILITY, MU, SIGMA, TAU
+
 sys.path.append('..')
+
+class Rating(trueskill.Rating):
+    def __init__(self, mu=None, sigma=None, experience = 0):
+        super().__init__(mu, sigma)
+        self.experience = experience
+    
+
 
 
 #no ranks, no draws
-class Trueskillplus():
-    def __init__(self, stat_coeff = 0, draw_probability=0):
-        self.env = trueskill.TrueSkill(draw_probability=0)
+class Trueskillplus(trueskill.TrueSkill):
+    def __init__(self, mu=..., sigma=..., beta=..., tau=..., draw_probability=..., experience_coeff = 0, squad_coeffs : dict = None, stat_coeff = 1):
+        super().__init__(mu, sigma, beta, tau, draw_probability)
+        
         #todo: give env the following
         #stat coeff: difference from the expected * how much should be the new sigma?
         #default 1 -> new sigma is sigma + abs(stat_diff - expected_stat_diff) 
@@ -19,6 +29,11 @@ class Trueskillplus():
         #squad coeff
         #experience coeff (both add to mu)
         self.stat_coeff = stat_coeff
+        self.experience_coeff = experience_coeff
+        self.squad_coeffs = squad_coeffs
+
+    
+
 
     def win_probability(self, team1, team2): #Szervezd ezt ki egy külön modulba, kapja az env-et paraméterkén
     
@@ -29,9 +44,10 @@ class Trueskillplus():
 
         return self.env.cdf(delta_mu / denom)
 
-    def rate(rating_groups, points = None, stats = None, model: tf.keras.Model = None):
-        #put code here
-        
+    def rate(self, rating_groups, ranks=None, weights=None, min_delta=...):
+
+        return super().rate(rating_groups, ranks, weights, min_delta)
+       
         """
         
 
@@ -68,15 +84,16 @@ class Trueskillplus():
         self.tau = self.tau + self.tau * diff #need to modify by some amount.
         
         """
-        trueskill.rate(rating_groups, ranks=None, weights=None, min_delta=0.0001)
+        
     
-    def rate_1vs1(self, rating1 : trueskill.Rating, rating2 : trueskill.Rating, stats = None, predicted_stats = None, experiences = None):
-        #ratings would get switched around if one team had more points.
-        #model should have columns!
-        #t1 is the winner always here.
-        #todo maybe move this over to rate_csgo
-        
-        
+
+    
+    def rate_1vs1(self, rating1 : Rating, rating2 : Rating, stats = None, predicted_stats = None):
+       
+        rating1 = Rating(rating1.mu + rating1.mu * ((1 / rating1.experience + 1) * self.experience_coeff))
+        rating2 = Rating(rating2.mu + rating2.mu * ((1 / rating2.experience + 1) * self.experience_coeff))
+
+
         if stats is not None and predicted_stats is not None:
             
             rating_diff = abs(rating1.mu - rating2.mu)
@@ -96,3 +113,6 @@ class Trueskillplus():
         rating2 = trueskill.Rating(rating2.mu, rating2.sigma + stat_offset) #large diff means an upset happened, so sigma gets modified
         #add experience_offset to ratings here
         return trueskill.rate_1vs1(rating1, rating2)
+    
+
+    
