@@ -44,10 +44,13 @@ class Trueskillplus(trueskill.TrueSkill):
 
         return self.env.cdf(delta_mu / denom)
 
-    def rate(self, rating_groups, ranks=None, weights=None, min_delta=...):
+    def rate(self, rating_groups, ranks=None, weights=None, min_delta=..., stats = None, expected_stats = None, squads : dict = None):
+        #todo validate. squads should indicate which team had what size of squad.
+        
         
         super().validate_rating_groups(rating_groups)
-        
+
+        #TODO: validate 
         super().rate(rating_groups, ranks, weights, min_delta)
         #N:N team match – [(r1, r2, r3), (r4, r5, r6)]
         #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)]
@@ -96,16 +99,16 @@ class Trueskillplus(trueskill.TrueSkill):
     
 
     
-    def rate_1vs1(self, rating1 : Rating, rating2 : Rating, stats = None, predicted_stats = None):
+    def rate_1vs1(self, rating1 : Rating, rating2 : Rating, stats = None, expected_stats = None):
        
         rating1 = Rating(rating1.mu + rating1.mu * ((1 / rating1.experience + 1) * self.experience_coeff))
         rating2 = Rating(rating2.mu + rating2.mu * ((1 / rating2.experience + 1) * self.experience_coeff))
 
 
-        if stats is not None and predicted_stats is not None:
+        if stats is not None and expected_stats is not None:
             
             rating_diff = abs(rating1.mu - rating2.mu)
-            stat_diff = abs(stats-predicted_stats)
+            stat_diff = abs(stats-expected_stats)
             #we would need to know the relation between +1 rating <-> +how much stats. should be a 'hyperparamener'
             #TODO ditch this if it doesnt perform well
             #add coeffs for both values maybe?
