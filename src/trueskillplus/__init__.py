@@ -45,8 +45,16 @@ class Trueskillplus(trueskill.TrueSkill):
         return self.env.cdf(delta_mu / denom)
 
     def rate(self, rating_groups, ranks=None, weights=None, min_delta=...):
+        
+        super().validate_rating_groups(rating_groups)
+        
+        super().rate(rating_groups, ranks, weights, min_delta)
+        #N:N team match – [(r1, r2, r3), (r4, r5, r6)]
+        #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)]
+        #N:M unbalanced match – [(r1,), (r2, r3, r4)]
+        #Free-for-all – [(r1,), (r2,), (r3,), (r4,)]
 
-        return super().rate(rating_groups, ranks, weights, min_delta)
+        return 
        
         """
         
