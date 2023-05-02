@@ -1,5 +1,4 @@
 import trueskill
-import tensorflow as tf
 import math
 import itertools
 import sys
@@ -9,6 +8,20 @@ from typing import List, Tuple
 
 sys.path.append('..')
 
+#: Default initial mean of ratings.
+MU = 25.
+#: Default initial standard deviation of ratings.
+SIGMA = MU / 3
+#: Default distance that guarantees about 76% chance of winning.
+BETA = SIGMA / 2
+#: Default dynamic factor.
+TAU = SIGMA / 100
+#: Default draw probability of the game.
+DRAW_PROBABILITY = .10
+#: A basis to check reliability of the result.
+DELTA = 0.0001
+
+
 class Rating_plus(trueskill.Rating):
     def __init__(self, mu=None, sigma=None, experience = 0):
         super().__init__(mu, sigma)
@@ -17,9 +30,8 @@ class Rating_plus(trueskill.Rating):
 
 
 
-#no ranks, no draws
 class Trueskillplus(trueskill.TrueSkill):
-    def __init__(self, mu=..., sigma=..., beta=..., tau=..., draw_probability=..., experience_coeffs : dict = None, squad_coeffs : dict = None, stat_coeff = 1):
+    def __init__(self, mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROBABILITY, experience_coeffs : dict = None, squad_coeffs : dict = None, stat_coeff = 1):
         super().__init__(mu, sigma, beta, tau, draw_probability)
         
         #todo: give env the following
@@ -31,7 +43,7 @@ class Trueskillplus(trueskill.TrueSkill):
         #experience coeff (both add to mu)
         self.stat_coeff = stat_coeff
         if experience_coeffs is None:
-            self.experience_coeffs = {0:1.05, 1:1.04, 2:1.02}
+            self.experience_coeffs = {0:0.05, 1:0.04, 2:0.02}
         self.experience_coeff = experience_coeffs
         if squad_coeffs is None:
             self.squad_coeffs = {1:0, 2:0.01, 3:0.02, 4:0.03, 5:0.04, 6:0.05, 7:0.06, 8:0.07, 9:0.08, 10:0.1}
@@ -52,20 +64,22 @@ class Trueskillplus(trueskill.TrueSkill):
 
         return self.env.cdf(delta_mu / denom)
 
-    def rate(self, rating_groups : List[Tuple], ranks=None, weights=None, min_delta=..., stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : List = None):
+    def rate(self, rating_groups : List[Tuple], ranks=None, weights=None, min_delta=0.001, stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : List = None):
       
         super().validate_rating_groups(rating_groups)
         #TODO none lekezelés
         if (squads is None):
             squads = [1 for x in rating_groups]
 
-        if len(rating_groups) != len(stats) and len(rating_groups) != len(expected_stats):
-            logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
-            return None
-        
-        if not (all(len(item1) == len(item2) and len(item1) == len(item3) for item1, item2, item3 in zip(rating_groups, stats, expected_stats))):
-            logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
-            return None
+        if stats is not None and expected_stats is not None:
+
+            if len(rating_groups) != len(stats) and len(rating_groups) != len(expected_stats):
+                logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
+                return None
+            
+            if not (all(len(item1) == len(item2) and len(item1) == len(item3) for item1, item2, item3 in zip(rating_groups, stats, expected_stats))):
+                logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
+                return None
         
         for i, team in enumerate(rating_groups[:-1]):
             next_team = rating_groups[i+1]
@@ -92,12 +106,14 @@ class Trueskillplus(trueskill.TrueSkill):
 
             
             for r, s, es in zip(team_tuple, stat_tuple, expected_stat_tuple):
+                
                 #caluclate individual statistics
                 stat_diff = abs(s-es)
                 rating_diff = abs(
                     r.mu - 
                     (sum(average_ratings[:i] + average_ratings[i+1:]) / len(average_ratings[:i] + average_ratings[i+1:]))
                 )
+               
                 stat_offset = (stat_diff / (rating_diff + 1)) *  self.stat_coeff
                 
                 #calculate squad offset
@@ -105,16 +121,17 @@ class Trueskillplus(trueskill.TrueSkill):
                     squad_offset = self.squad_coeffs[squads[i]]
                 
                 else:
-                    squad_offset = 1
+                    squad_offset = 0
 
                 #calculate experience offset
                 if r.experience in self.experience_coeffs:
                     experience_offset = self.experience_coeffs[r.experience]
+                    
                 
                 else:
-                    experience_offset = 1
-   
-             
+                    experience_offset = 0
+
+                print(r.mu, r.mu * squad_offset, r.mu * experience_offset, r.sigma + stat_offset)
                 new_team.append(Rating_plus(r.mu +
                                             r.mu * squad_offset +
                                             r.mu * experience_offset,
@@ -129,8 +146,9 @@ class Trueskillplus(trueskill.TrueSkill):
             new_ratings.append(tuple(new_team))
             i+=1
 
-        
-        return super().rate(new_ratings, ranks, weights, min_delta)
+        print(new_ratings)
+        #TODO bad bc returns classic ts object, losing experience data
+        return super().rate(new_ratings, ranks, weights, DELTA)
     
         #N:N team match – [(r1, r2, r3), (r4, r5, r6)] -works
         #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)] - doesnt really work
