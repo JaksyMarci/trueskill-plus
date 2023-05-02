@@ -71,6 +71,8 @@ class Trueskillplus(trueskill.TrueSkill):
         if (squads is None):
             squads = [1 for x in rating_groups]
 
+        
+
         if stats is not None and expected_stats is not None:
 
             if len(rating_groups) != len(stats) and len(rating_groups) != len(expected_stats):
