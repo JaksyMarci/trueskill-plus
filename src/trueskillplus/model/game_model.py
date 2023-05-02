@@ -8,7 +8,7 @@ Trains a predictive model used to guess scores based on past matches.
 """
 def train_csgo_model(df : pd.DataFrame):
     #drop unnecessary columns
-    df = df[['winner', 't1_points', 't2_points', 'is_bestof', 'kdr_diff', 't1_ts_rating_mu', 't2_ts_rating_mu']]
+    df = df[['winner', 't1_points', 't2_points', 'is_bestof', 'kdr_diff']]
 
     # Convert column to a one-hot encoded format
     df= pd.get_dummies(df, columns=['winner', 'is_bestof'], dtype=np.float64)
@@ -26,7 +26,7 @@ def train_csgo_model(df : pd.DataFrame):
 
     # Create a multilayer perceptron model with ReLU activation
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(32, activation='relu', input_shape=(8,)),
+        tf.keras.layers.Dense(32, activation='relu', input_shape=(6,)),
         tf.keras.layers.Dense(32, activation='relu'),
         tf.keras.layers.Dense(8, activation='relu'),
         tf.keras.layers.Dense(1)
@@ -63,7 +63,7 @@ def train_csgo_model(df : pd.DataFrame):
     """
 
 def train_league_model(df : pd.DataFrame):
-    df = df[['golddiff','bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds', 'bRating', 'rRating']].astype(float)
+    df = df[['golddiff','bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds']].astype(float)
    
     X = df.drop(['golddiff'], axis=1).values
     y = df[['golddiff']].values
@@ -73,8 +73,8 @@ def train_league_model(df : pd.DataFrame):
 
     # Create a multilayer perceptron model with ReLU activation
     model = tf.keras.models.Sequential([
-        tf.keras.layers.Dense(16, activation='relu', input_shape=(16,)),
-        tf.keras.layers.Dense(16, activation='relu'),
+        tf.keras.layers.Dense(32, activation='relu', input_shape=(14,)),
+        tf.keras.layers.Dense(32, activation='relu'),
         tf.keras.layers.Dense(8, activation='relu'),
         tf.keras.layers.Dense(1)
     ])
@@ -83,7 +83,7 @@ def train_league_model(df : pd.DataFrame):
     model.compile(loss='mse', optimizer='adam')
 
     # Fit the model on the training data
-    model.fit(X_train, y_train, epochs=50, batch_size=10, callbacks=tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3))
+    model.fit(X_train, y_train, epochs=200, batch_size=10, callbacks=tf.keras.callbacks.EarlyStopping(monitor='loss', patience=3))
     
 
     # Evaluate the model on the testing data

@@ -44,11 +44,9 @@ for tag in df['blueTeamTag'].unique():
     ts_plus_ratings[tag] = trueskill.Rating()
 
 ts_env = trueskill.TrueSkill(draw_probability=0)
-ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff = 0.00001)
+ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff = 0.00005)
 
 df['predicted_bResult'] = '?'
-df['bRating'] = '?'
-df['rRating'] = '?'
 
 #prepare graph
 x = np.arange(len(df))
@@ -61,8 +59,6 @@ for index, row in df.iterrows():
     b_win_prob = ts_plus_env.win_probability([ts_ratings[row['blueTeamTag']]], [ts_ratings[row['redTeamTag']]])
     
     df.at[index, 'predicted_bResult'] = 1 if b_win_prob > 0.5 else 0
-    df.at[index, 'bRating'] = ts_ratings[row['blueTeamTag']].mu
-    df.at[index, 'rRating'] = ts_ratings[row['redTeamTag']].mu
 
     if row['bResult'] == 1:
         #blue win
@@ -92,6 +88,16 @@ percent_matches = num_matches / total_rows * 100
 print(
     f'Trueskill correctly predicts the outcome {percent_matches}% of the time.')
 
+df_tail = df.tail(-100)
+
+num_matches = sum(df_tail['bResult'] == df_tail['predicted_bResult'])
+total_rows = len(df_tail)
+percent_matches = num_matches / total_rows * 100
+
+print(
+    f'After removing the first 1000 rows and ratings converge, Trueskill correctly predicts the outcome {percent_matches}% of the time.')
+
+
 plt.close()
 #------------------------------------------------------------------------------
 #Trueskill plus part
@@ -116,20 +122,20 @@ for index, row in df.iterrows():
 
     df.at[index, 'predicted_bResult'] = 1 if b_win_prob > 0.5 else 0
 
-    pred_array = np.array(row[['bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds', 'bRating', 'rRating']]).astype(float)
+    pred_array = np.array(row[['bResult', 'rResult', 'bKills', 'bTowers' , 'bInhibs' , 'bDragons' , 'bBarons'  ,'bHeralds' , 'rKills' , 'rTowers' , 'rInhibs'  ,'rDragons' , 'rBarons'  ,'rHeralds']]).astype(float)
     
     if row['bResult'] == 1:
         #blue win
         b_new_rating, r_new_rating = ts_plus_env.rate_1vs1(rating1=ts_plus_ratings[row['blueTeamTag']],rating2= ts_plus_ratings[row['redTeamTag']], 
                                                             stats=row['golddiff'],
-                                                            predicted_stats=model(np.reshape(pred_array, (1,16))))
+                                                            expected_stats=model(np.reshape(pred_array, (1,14))))
         ts_plus_ratings[row['blueTeamTag']] = b_new_rating
         ts_plus_ratings[row['redTeamTag']] = r_new_rating
     else:
         #red win
         r_new_rating, b_new_rating = ts_plus_env.rate_1vs1(rating1=ts_plus_ratings[row['redTeamTag']],rating2= ts_plus_ratings[row['blueTeamTag']],
                                                             stats=row['golddiff'],
-                                                            predicted_stats=model(np.reshape(pred_array, (1,16))))
+                                                            expected_stats=model(np.reshape(pred_array, (1,14))))
         ts_plus_ratings[row['redTeamTag']] = r_new_rating
         ts_plus_ratings[row['blueTeamTag']] = b_new_rating
 
@@ -148,7 +154,17 @@ total_rows = len(df)
 percent_matches = num_matches / total_rows * 100
 
 print(
-    f'Trueskill correctly predicts the outcome {percent_matches}% of the time.')
+    f'Trueskill Plus correctly predicts the outcome {percent_matches}% of the time.')
+
+df_tail = df.tail(-100)
+
+num_matches = sum(df_tail['bResult'] == df_tail['predicted_bResult'])
+total_rows = len(df_tail)
+percent_matches = num_matches / total_rows * 100
+
+print(
+    f'After removing the first 100 rows and ratings converge, Trueskill Plus correctly predicts the outcome {percent_matches}% of the time.')
+
 
 print(ts_plus_ratings)
 plt.close()

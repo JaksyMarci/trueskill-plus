@@ -74,7 +74,7 @@ y = []
 
 # prepare TS env
 ts_env = trueskill.TrueSkill(draw_probability=0)
-ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff=0.003)
+ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff=0.5)
 
 ts_ratings = {}
 ts_plus_ratings = {}
@@ -105,12 +105,10 @@ df['kdr_diff'] = kdr_diff
 
 df['predicted_winner'] = 0
 df['t1_win_probability'] = 0
-df['t1_ts_rating'] = 0
-df['t2_ts_rating'] = 0
+
 predictions = []
 probabilities = []
-t1_ts_ratings = []
-t2_ts_ratings = []
+
 
 """
 Calculate original trueskil ratings
@@ -121,8 +119,7 @@ for index, row in df.iterrows():
     p = ts_plus_env.win_probability(team1=[ts_ratings[row['team_1']]], team2=[ts_ratings[row['team_2']]]) #TODO danger, environments could be different. 
     predictions.append('t1') if p > 0.5 else predictions.append('t2')
     probabilities.append(p)
-    t1_ts_ratings.append(ts_ratings[row['team_1']])
-    t2_ts_ratings.append(ts_ratings[row['team_2']])
+  
     if (row['winner'] == 't1'):
 
         t1_new_rating, t2_new_rating = ts_env.rate_1vs1(
@@ -149,10 +146,7 @@ for index, row in df.iterrows():
 
 df['predicted_winner'] = predictions
 df['t1_win_probability'] = probabilities
-df['t1_ts_rating_mu'] = [x.mu for x in t1_ts_ratings]
-df['t1_ts_rating_sigma'] = [x.sigma for x in t1_ts_ratings]
-df['t2_ts_rating_mu'] = [x.mu for x in t2_ts_ratings]
-df['t2_ts_rating_sigma'] = [x.sigma for x in t2_ts_ratings]
+
 #needed for plot
 label_list = []
 for key, value in ts_ratings.items():
@@ -207,11 +201,11 @@ for index, row in df.iterrows():
     
     if (row['winner'] == 't1'):
         pred_array = np.array([ row['t1_points'], row['t2_points'], 1.0, 0.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0, 
-                              ts_plus_ratings[row['team_1']].mu, ts_plus_ratings[row['team_2']].mu])
+                              ])
         t1_new_rating, t2_new_rating = ts_plus_env.rate_1vs1(
             rating1=ts_plus_ratings[row['team_1']], rating2=ts_plus_ratings[row['team_2']],
             stats=row['kdr_diff'],
-            predicted_stats=ts_plus_model(np.reshape(pred_array, (1,8)))
+            expected_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
             )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating
@@ -219,13 +213,13 @@ for index, row in df.iterrows():
 
     elif (row['winner'] == 't2'):
         pred_array= np.array([ row['t1_points'], row['t2_points'], 0.0, 1.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0,
-                              ts_plus_ratings[row['team_1']].mu, ts_plus_ratings[row['team_2']].mu])
+                              ])
         
         t2_new_rating, t1_new_rating = ts_plus_env.rate_1vs1(
             rating1=ts_plus_ratings[row['team_2']], 
             rating2=ts_plus_ratings[row['team_1']],
             stats=row['kdr_diff'],
-            predicted_stats=ts_plus_model(np.reshape(pred_array, (1,8)))
+            expected_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
             )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating
