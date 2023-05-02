@@ -150,9 +150,9 @@ class Trueskillplus(trueskill.TrueSkill):
         #TODO bad bc returns classic ts object, losing experience data
         return super().rate(new_ratings, ranks, weights, DELTA)
     
-        #N:N team match – [(r1, r2, r3), (r4, r5, r6)] -works
-        #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)] - doesnt really work
-        #could get all the the opposing teams average ratings - it would be noice
+        #N:N team match – [(r1, r2, r3), (r4, r5, r6)] - optimal
+        #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)] - calculates with the average of the opposing teams, not ideal
+
         #N:M unbalanced match – [(r1,), (r2, r3, r4)] - unsupported.
         #Free-for-all – [(r1,), (r2,), (r3,), (r4,)] # ffa is same as N:N:N
 
