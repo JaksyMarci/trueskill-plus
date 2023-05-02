@@ -43,7 +43,7 @@ class Trueskillplus(trueskill.TrueSkill):
         #experience coeff (both add to mu)
         self.stat_coeff = stat_coeff
         if experience_coeffs is None:
-            self.experience_coeffs = {0:0.05, 1:0.04, 2:0.02}
+            self.experience_coeffs = {0:0.005, 1:0.004, 2:0.002}
         self.experience_coeff = experience_coeffs
         if squad_coeffs is None:
             self.squad_coeffs = {1:0, 2:0.01, 3:0.02, 4:0.03, 5:0.04, 6:0.05, 7:0.06, 8:0.07, 9:0.08, 10:0.1}
@@ -100,10 +100,11 @@ class Trueskillplus(trueskill.TrueSkill):
 
         i = 0
         new_ratings = []
+        experiences = []
 
         for team_tuple, stat_tuple, expected_stat_tuple in zip(rating_groups, stats, expected_stats):
             new_team = []
-
+            team_experiences = []
             
             for r, s, es in zip(team_tuple, stat_tuple, expected_stat_tuple):
                 
@@ -136,20 +137,25 @@ class Trueskillplus(trueskill.TrueSkill):
                                             r.mu * squad_offset +
                                             r.mu * experience_offset,
                                             r.sigma + stat_offset,
-                                            r.experience + 1))
-                
+                                            r.experience))
+                team_experiences.append(r.experience + 1)
                 
                 #r : trueskillplus rating
                 #s : stat number
                 #es: expected stat
 
             new_ratings.append(tuple(new_team))
+            experiences.append(tuple(team_experiences))
             i+=1
 
         print(new_ratings)
         #TODO bad bc returns classic ts object, losing experience data
-        return super().rate(new_ratings, ranks, weights, DELTA)
-    
+
+        
+
+        return self.to_trueskill_plus(super().rate(new_ratings, ranks, weights, DELTA), experiences)
+
+        
         #N:N team match – [(r1, r2, r3), (r4, r5, r6)] - optimal
         #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)] - calculates with the average of the opposing teams, not ideal
 
@@ -224,5 +230,18 @@ class Trueskillplus(trueskill.TrueSkill):
         #add experience_offset to ratings here
         return trueskill.rate_1vs1(rating1, rating2)
     
+    def to_trueskill_plus(self, rating_groups : List[Tuple], experiences : List[Tuple] = None):
+        ts_plus_ratings = []
 
+        for team, team_exp in zip(rating_groups, experiences):
+            ts_plus_team = []
+            for r, e in zip(team, team_exp):
+                if experiences:
+                    ts_plus_team.append(Rating_plus(r.mu,r.sigma, e))
+                else:
+                    ts_plus_team.append(Rating_plus(r.mu,r.sigma))
+            
+            ts_plus_ratings.append(tuple(ts_plus_team))
+        
+        return ts_plus_ratings
     
