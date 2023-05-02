@@ -52,7 +52,7 @@ class Trueskillplus(trueskill.TrueSkill):
 
         return self.env.cdf(delta_mu / denom)
 
-    def rate(self, rating_groups, ranks=None, weights=None, min_delta=..., stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : list = None):
+    def rate(self, rating_groups : List[Tuple], ranks=None, weights=None, min_delta=..., stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : List = None):
       
         super().validate_rating_groups(rating_groups)
         #TODO none lekezelés
