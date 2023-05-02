@@ -5,6 +5,7 @@ import itertools
 import sys
 import logging
 from trueskill import *
+from typing import List, Tuple
 
 sys.path.append('..')
 
@@ -51,13 +52,12 @@ class Trueskillplus(trueskill.TrueSkill):
 
         return self.env.cdf(delta_mu / denom)
 
-    def rate(self, rating_groups, ranks=None, weights=None, min_delta=..., stats = None, expected_stats = None, squads : list = None):
-        #todo validate. squads should indicate which team had what size of squad.
+    def rate(self, rating_groups, ranks=None, weights=None, min_delta=..., stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : list = None):
+      
         super().validate_rating_groups(rating_groups)
         #TODO none lekezelés
         if (squads is None):
             squads = [1 for x in rating_groups]
-
 
         if len(rating_groups) != len(stats) and len(rating_groups) != len(expected_stats):
             logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
@@ -90,7 +90,7 @@ class Trueskillplus(trueskill.TrueSkill):
         for team_tuple, stat_tuple, expected_stat_tuple in zip(rating_groups, stats, expected_stats):
             new_team = []
 
-            squad_offset = self.squad_coeffs[squads[i]]
+            
             for r, s, es in zip(team_tuple, stat_tuple, expected_stat_tuple):
                 #caluclate individual statistics
                 stat_diff = abs(s-es)
@@ -109,10 +109,10 @@ class Trueskillplus(trueskill.TrueSkill):
 
                 #calculate experience offset
                 if r.experience in self.experience_coeffs:
-                    experience_offset = self.squad_coeffs[squads[i]]
+                    experience_offset = self.experience_coeffs[r.experience]
                 
                 else:
-                    squad_offset = 1
+                    experience_offset = 1
    
              
                 new_team.append(Rating_plus(r.mu +
@@ -130,14 +130,15 @@ class Trueskillplus(trueskill.TrueSkill):
             i+=1
 
         
-        super().rate(rating_groups, ranks, weights, min_delta)
+        return super().rate(new_ratings, ranks, weights, min_delta)
+    
         #N:N team match – [(r1, r2, r3), (r4, r5, r6)] -works
         #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)] - doesnt really work
         #could get all the the opposing teams average ratings - it would be noice
         #N:M unbalanced match – [(r1,), (r2, r3, r4)] - unsupported.
         #Free-for-all – [(r1,), (r2,), (r3,), (r4,)] # ffa is same as N:N:N
 
-        return 
+        
        
         """
         
