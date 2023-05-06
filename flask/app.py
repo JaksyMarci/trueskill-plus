@@ -134,8 +134,10 @@ def calculate():
     return render_template('main.html')
 
 
-@app.route('/update_player', methods=['POST'])
+@app.route('/update_player', methods=['GET','POST'])
 def update_player():
+    
+    print(request.form)
     if request.form['action'] == 'remove':
 
         s = dict(session['teams'])
@@ -146,11 +148,12 @@ def update_player():
         for teams, teamMembers in s.items():
             teamMembers.pop(request.form['playerName'], '')
 
-        return render_template('main.html')
-    elif request.form['action'] == 'update':
-        print('update')
-        print(request.form)
         
+    elif request.form['action'] == 'update':
+        print('update TODO')
+
+    
+    return render_template('main.html')
 
 
 @app.route('/remove_team', methods=['POST'])
