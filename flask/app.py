@@ -18,8 +18,8 @@ import sys
 # parent directory
 import logging
 sys.path.append("..")
-from trueskill import Rating, rate, TrueSkill
-#import src.trueskillplus
+#from trueskill import Rating, rate, TrueSkill
+from src.trueskillplus import Rating_plus, Trueskillplus, rate
 logging.basicConfig(level=logging.INFO)
 
 # import method from sibling
@@ -32,13 +32,12 @@ use('agg')  # MATPLOTLIB IS NOT THREAD SAFE.
 
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_PERMANENT"] = False #TODO change this to ture
+app.config["SESSION_TYPE"] = "filesystem" #TODO change this to null
 Session(app)
 
 
-@app.route('/')
-@app.route('/main')
+@app.route('/', methods=['GET','POST'])
 def index():
 
     
@@ -46,12 +45,19 @@ def index():
         'teams': {
             'Team 1': {},
             'Team 2': {}
-        }
+        },
+        'env':{}
 
     })
     session.pop('img', '')
 
     # print(session['teams'])
+    return render_template('main.html')
+
+
+@app.route('/main', methods=['GET','POST'])
+def index_main():
+    print("\nCurrent session: \n", dict(session.items()))
     return render_template('main.html')
 
 
@@ -132,11 +138,9 @@ def remove_team():
 @app.route('/calculate', methods=['POST'])
 def calculate():
    
-    
-    print('RANKS: ', request.form)
+    env = Trueskillplus()  #TODO ide env
+    print(request.form)
     s = dict(session['teams'].items())
-    print('CALCULATING: ', s)
-    print(dict(session))
 
     ratings = []
     for teamName, teamMembers in s.items():
@@ -188,8 +192,23 @@ def calculate():
 
 @app.route('/manage', methods=['GET','POST'])
 def manage():
-    #logging.info(request.form)
-    return render_template('manage.html')
+    logging.info(request.form)
+    if request.method == 'POST':
+        
+            
+        
+        session['env']['beta'] = request.form['beta']
+        session['env']['tau'] = request.form['tau']
+        session['env']['draw_probability'] = request.form['draw_probability']
+        session['env']['stat_coefficient'] = request.form['stat_coefficient']
+        for i in range(5):
+            session['env'][f'squad_coefficient_{i+1}'] = request.form[f'squad_coefficient_{i+1}']
+            session['env'][f'experience_{i+1}'] = request.form[f'experience_{i+1}']
+        
+        return render_template('main.html')
+    elif request.method == 'GET':
+        return render_template('manage.html')
+    
 
 
 if __name__ == '__main__':
