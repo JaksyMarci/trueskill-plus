@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib import use
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-
+#TODO: the squad offset might be wrong. large squads could end up gaining rating despite losing!! TODO test.
 
 # import requi9red module
 import sys
