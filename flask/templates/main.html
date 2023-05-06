@@ -37,32 +37,24 @@
 
             {% for teamName, teamMembers in session['teams'].items() -%}
         
-            <div class="container">
-                <div class="row">
-                    
-                        <div class="col">
-                            
+            
                             <h2>{{teamName}} </h2>
-                            
-                        </div>
+                            <form action="/remove_team" method="POST">
+                                <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
+                                <input type="submit" id="remove_team" class="btn btn-danger" value="Remove team">
+                            </form>
+                        
                         
                     
 
-                        <div class="col">
-                            <form action="/remove_team" method="POST">
-                                <input type="submit" id="remove_team" class="btn btn-danger" value="Remove team">
-                            </form>
-                        </div>
+                        
                         
                     
                         
                             
-                        <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
-                    </form>
-                </div>
-            </div>
-        
-        
+                        
+          
+        <!--
             <div class="form-group">
                 <form action="/add_player" method="POST" class="form-inline">
                     <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
@@ -111,6 +103,7 @@
                     
                 </form>
             </div>
+            -->
             <div class="table-responsive">
                 <table class="table table-bordered table-striped table-hover align-middle">
                     <thead class="table-primary">
@@ -118,12 +111,67 @@
                         <th>Mu</th>
                         <th>Sigma</th>
                         <th>Stats</th>
-                        <th>Expected stats</th>
+                        <th>Expected statistics</th>
                         <th>Experience</th>
                         <th>In squad?</th>
                         <th></th>
                     </thead>
                     <tbody>
+                        
+                    
+                        <tr>
+
+                        
+                        <div class="form-group">
+                            <form action="/add_player" method="POST" class="form-inline">
+                                <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
+                                <td>
+                                    
+                                    
+                                        <label for="playerName" class="form-label">Player name</label>
+                                        <input type="text" class="form-control" id="playerName" name="playerName">
+                                    
+                                </td>
+                                <td>    
+                                        <label for="mu" class="form-label">Mu value</label>
+                                        <input type="number" class="form-control" id="mu" value="25" name="mu">
+                                    </td>
+                                <td>    
+                                        <label for="sigma" class="form-label">Sigma value</label>
+                                        <input type="number" class="form-control" id="sigma" value="8.33" name="sigma">
+                                    
+                                   </td> 
+                               <td>     
+                                        <label for="stats" class="form-label">Statistics</label>
+                                        <input type="number" class="form-control" id="stats" value="0" name="stats">
+                                   </td> 
+                               <td>     
+                                        <label for="pred_stats" class="form-label">Predicted Statistics</label>
+                                        <input type="number" class="form-control" id="pred_stats" value="0" name="pred_stats">
+                                    
+                                    </td>
+                                <td>    
+                                        <label for="experience" class="form-label">Experience</label>
+                                        <input type="number" class="form-control" id="experience" value="0" name="experience">
+                                    </td>
+                                <td>    
+                                        <label for="squad" class="form-check-label">In squad?</label>
+                                        <br>
+                                        <input type="checkbox" class="form-check-input" id="squad" name="squad">
+                                        
+                                    </td>
+                                  <td>  
+                                        <label for="addPlayer" class="form-label"> </label>
+                                        <input type="submit" id="addPlayer" class="form-control btn btn-primary" value="Add player">
+                                    
+                                    
+                                </div>
+                                
+                                
+                                
+                            </form>
+                        </tr>
+                        </div>
                         
                         {% for key, values in session['teams'][teamName].items() -%}
                         <tr>
@@ -173,12 +221,7 @@
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form> 
-                                <form action="/update_player" method="post">
-                                    <input type="hidden" name="playerName" value={{ key }}> 
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                    </button>
-                                </form>
+                               
                             </td>
                         </tr>
                         {% endfor %}
