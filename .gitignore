@@ -1,5 +1,5 @@
 Thesis_Jakab_Márton_Zoltán_x5mc0i.docx
-.pyc
+*.pyc
 flask_session/
 flask/__pycache__
 src/trueskillplus/__pycache__
