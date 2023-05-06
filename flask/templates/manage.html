@@ -40,6 +40,62 @@
                     <input type="number" min="0.0001" max="0.9999" placeholder="0.100" step="0.0001" class="form-control" id="draw_probability" name="draw_probability" required>
                     <small class="form-text">The draw probability between two teams. If it is a float, the game has fixed draw probability. Otherwise, the draw probability will be decided dynamically per each match.</small>
                   </div>
+                  <div class="form-group">
+                    <label for="stat_coefficient">Statistics coefficient</label>
+                    <input type="number" min="0.0001" max="0.9999" placeholder="0" step="0.0001" class="form-control" id="stat_coefficient" name="stat_coefficient" required>
+                    <small class="form-text">Represents how much a certain statistic difference (e.g. player score, kill count, team goals etc.) between two players or teams should matter in the matchmaking process. Enter zero if you wish to opt out of this feature.</small>
+                  </div>
+                  <table>
+                    <label for="experience_0">Experience coefficients</label>
+                      <tr>
+                        {% for i in range(5):%}
+                        <td><small class="form-text">{{i+1}}</small></td>
+                        {%endfor%}
+                      </tr>
+                    
+                      <tr>
+                        
+                        {% for i in range(5):%}
+                        <td>
+
+                           <input type="number" min="0.0001" max="0.9999" placeholder="0" step="0.0001" class="form-control" id="experience_{{i}}" name="experience_{{i}}" required>
+                           
+                        </td>
+                        {%endfor%}
+                      </tr>
+                    
+                  </table>
+                  <small class="form-text">Each coefficient represents a relation of how experience effects the initial growth of rating. New players tend to improve faster - therefore, lower experience implies a higher coefficient. 
+                    Already skilled players don't actually benefit from this effect, therefore level 5 should be left on zero.
+                    Enter zero everywhere if you wish to opt out of this feature.
+                  </small>
+                  <br>
+                  <table>
+                    <label for="squad_0">Squad coefficients</label>
+                      <tr>
+                        {% for i in range(4):%}
+                        <td><small class="form-text">{{i+1}}</small></td>
+                        {%endfor%}
+                        <td><small class="form-text">5+</small></td>
+                      </tr>
+                    
+                      <tr>
+                        
+                        {% for i in range(5):%}
+                        <td>
+
+                           <input type="number" min="0.0001" max="0.9999" placeholder="0" step="0.0001" class="form-control" id="squad_coefficient_{{i}}" name="squad_coefficient_{{i}}" required>
+                           
+                        </td>
+                        {%endfor%}
+                      </tr>
+                    
+                  </table>
+                  <small class="form-text">Each coefficient represents a relation of how being in a squad with a certain size effects the win rate of a player/team in a specific game. 
+                    A 'squad' of 1 doesn't affect it at all (and should be left on zero), but a large squad could achieve way higher win rates than expected.
+                    Enter zero everywhere if you wish to opt out of this feature.
+                  </small>
+                  <br>
                   <button type="submit" class="btn btn-primary">Submit</button>
             </form>
             
