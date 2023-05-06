@@ -3,3 +3,5 @@ Thesis_Jakab_Márton_Zoltán_x5mc0i.docx
 flask_session/
 flask/__pycache__
 src/trueskillplus/__pycache__
+flask/__pycache__/app.cpython-311.pyc
+flask/flask_session/*
