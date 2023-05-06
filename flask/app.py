@@ -19,6 +19,7 @@ import sys
 import logging
 sys.path.append("..")
 from trueskill import Rating, rate, TrueSkill
+#import src.trueskillplus
 logging.basicConfig(level=logging.INFO)
 
 # import method from sibling
@@ -80,8 +81,12 @@ def manage():
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
+   
+    formitem = request.form
+    print('RANKS: ', formitem)
     s = dict(session['teams'].items())
     print('CALCULATING: ', s)
+    print(dict(session))
 
     ratings = []
     for teamName, teamMembers in s.items():

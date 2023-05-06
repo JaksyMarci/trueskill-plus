@@ -38,20 +38,28 @@
         
             <div class="container">
                 <div class="row">
-                    <form action="/remove_team" method="POST">
+                    
                         <div class="col">
                             
                             <h2>{{teamName}} </h2>
                             
                         </div>
+                        
                         <div class="col">
-                            
-                            <input type="submit" id="remove_team" class="btn btn-danger" value="Remove team">
+                            <label for="rank" class="form-label">Rank</label>
+                            <input type="number" name="rank" value="">
                             
                         </div>
+
+                        <div class="col">
+                            <form action="/remove_team" method="POST">
+                                <input type="submit" id="remove_team" class="btn btn-danger" value="Remove team">
+                            </form>
+                        </div>
                         
+                    
                         
-                        
+                            
                         <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
                     </form>
                 </div>
@@ -74,6 +82,24 @@
                         <div class="col">
                             <label for="sigma" class="form-label">Sigma value</label>
                             <input type="number" class="form-control" id="sigma" value="8.33" name="sigma">
+                        </div>
+                        <div class="col">
+                            <label for="experience" class="form-label">Played matches</label>
+                            <input type="number" class="form-control" id="experience" value="0" name="experience">
+                        </div>
+                        <div class="col">
+                            <label for="stats" class="form-label">Statistics</label>
+                            <input type="number" class="form-control" id="stats" value="0" name="stats">
+                        </div>
+                        <div class="col">
+                            <label for="pred_stats" class="form-label">Predicted Statistics</label>
+                            <input type="number" class="form-control" id="pred_stats" value="0" name="pred_stats">
+                        </div>
+                        <div class="col">
+                            <label for="squad" class="form-check-label">In squad?</label>
+                            <br>
+                            <input type="checkbox" class="form-check-input" id="squad" name="squad">
+                            
                         </div>
                         <div class="col">
                             <label for="addPlayer" class="form-label"> </label>
@@ -116,8 +142,12 @@
                 <input type="text" name="teamName">
                 <button class=" btn btn-success">Add team</button>
             </form>
-            <form action="/calculate" method="POST">
-                <button class="btn btn-outline-dark">Update ratings</button>
+            <form action="/calculate" method="POST" id="calculate">
+                
+                <label for="ranks" class="form-label">Rank of teams</label>
+                <input type="text" class="form-control" id="ranks" value="1,2" name="ranks">
+                <button type="submit" class="btn btn-outline-dark">Update ratings</button>
+                
             </form>
         </div>
         <div class="col"></div>
