@@ -89,15 +89,16 @@
                             <label for="pred_stats" class="form-label">Predicted Statistics</label>
                             <input type="number" class="form-control" id="pred_stats" value="0" name="pred_stats">
                         </div>
+                        
+                        <div class="col">
+                            <label for="experience" class="form-label">Experience</label>
+                            <input type="number" class="form-control" id="experience" value="0" name="experience">
+                        </div>
                         <div class="col">
                             <label for="squad" class="form-check-label">In squad?</label>
                             <br>
                             <input type="checkbox" class="form-check-input" id="squad" name="squad">
                             
-                        </div>
-                        <div class="col">
-                            <label for="experience" class="form-label">Experience</label>
-                            <input type="number" class="form-control" id="experience" value="0" name="experience">
                         </div>
                         <div class="col">
                             <label for="addPlayer" class="form-label"> </label>
@@ -119,6 +120,7 @@
                         <th>Stats</th>
                         <th>Expected stats</th>
                         <th>Experience</th>
+                        <th>In squad?</th>
                         <th></th>
                     </thead>
                     <tbody>
@@ -156,14 +158,27 @@
                                 </form>
                             </td>
                                 
-                         
+                            <td> 
+                                {% if values['squad'] == 'on' %}
+                                    <i class="bi bi-check-circle"></i>
+                                {% else %}
+                                    <i class="bi bi-circle"></i>
+                                {%endif%}
+                            </td>
                            
                             <td> 
                                 <form action="/remove_player" method="post">
                                     <input type="hidden" name="playerName" value={{ key }}> 
-                                    <input type="submit" class="btn btn-outline-danger" value="Remove">
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </form> 
-                        
+                                <form action="/update_player" method="post">
+                                    <input type="hidden" name="playerName" value={{ key }}> 
+                                    <button type="submit" class="btn btn-warning">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
