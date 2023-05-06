@@ -44,8 +44,8 @@ def index():
     
     session.update({
         'teams': {
-            'team1': {},
-            'team2': {}
+            'Team 1': {},
+            'Team 2': {}
         }
 
     })
@@ -55,21 +55,27 @@ def index():
     return render_template('main.html')
 
 
-@app.route('/add_player', methods=['POST', 'GET'])
-def add_to_list():
-    if request.method == 'POST':
-        formitem = request.form
-        print('got from form: ', formitem)
+@app.route('/add_player', methods=['POST'])
+def add_player():
+    
+    
+    print('got from form: ', request.form)
 
-        s = dict(session['teams'].items())
-        team = formitem['team']
-        playerName = formitem['playerName']
-        s[team][playerName] = {'mu': '', 'sigma': ''}
+    s = dict(session['teams'].items())
+    team = request.form['team']
+    playerName = request.form['playerName']
+    s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
 
-        s[team][playerName]['mu'] = formitem['mu']
-        s[team][playerName]['sigma'] = formitem['sigma']
-
-        return render_template('main.html')
+    s[team][playerName]['mu'] = request.form['mu']
+    s[team][playerName]['sigma'] = request.form['sigma']
+    s[team][playerName]['stats'] = request.form['stats']
+    s[team][playerName]['pred_stats'] = request.form['pred_stats']
+    s[team][playerName]['experience'] = request.form['experience']
+    if 'squad' in request.form:
+        s[team][playerName]['squad'] = 'on'
+    else:
+        s[team][playerName]['squad'] = 'off'
+    return render_template('main.html')
 
 
 
@@ -82,8 +88,8 @@ def manage():
 @app.route('/calculate', methods=['POST'])
 def calculate():
    
-    formitem = request.form
-    print('RANKS: ', formitem)
+    request.form
+    print('RANKS: ', request.form)
     s = dict(session['teams'].items())
     print('CALCULATING: ', s)
     print(dict(session))
@@ -134,7 +140,7 @@ def calculate():
     return render_template('main.html')
 
 
-@app.route('/update_player', methods=['GET','POST'])
+@app.route('/update_player', methods=['POST'])
 def update_player():
     
     print(request.form)
@@ -150,7 +156,20 @@ def update_player():
 
         
     elif request.form['action'] == 'update':
-        print('update TODO')
+
+        
+        s = dict(session['teams'])
+        team = request.form['team']
+        playerName = request.form['playerName']
+        s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
+
+        s[team][playerName]['mu'] = request.form['mu']
+        s[team][playerName]['sigma'] = request.form['sigma']
+        s[team][playerName]['stats'] = request.form['stats']
+        s[team][playerName]['pred_stats'] = request.form['pred_stats']
+        s[team][playerName]['experience'] = request.form['experience']
+        s[team][playerName]['squad'] = request.form['squad']
+
 
     
     return render_template('main.html')
@@ -160,8 +179,6 @@ def update_player():
 def remove_team():
 
     session['teams'].pop(request.form['team'])
-
-    print(session)
 
     return render_template('main.html')
 
@@ -188,8 +205,10 @@ session:
                 {
                 "sigma" : "",
                 "mu" : "",
+                "stat" : "",
+                "pred"
                 "experience" : "",
-                "isInSquad" : "",
+                
                 etc.
             },
 
