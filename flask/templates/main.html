@@ -34,6 +34,14 @@
             
             <img src="data:image/png;base64, {{ session['img'] }} "/>
 
+            
+            <form action="/calculate" method="POST" id="calculate">
+                
+                <label for="ranks" class="form-label">Rank of teams</label>
+                <input type="text" class="form-control" id="ranks" value="1,2" name="ranks">
+                <button type="submit" class="btn btn-outline-dark">Update ratings</button>
+                
+            </form>
 
             {% for teamName, teamMembers in session['teams'].items() -%}
         
@@ -128,35 +136,34 @@
                                 <td>
                                     
                                     
-                                        <label for="playerName" class="form-label">Player name</label>
+                                        
                                         <input type="text" class="form-control" id="playerName" name="playerName">
                                     
                                 </td>
                                 <td>    
-                                        <label for="mu" class="form-label">Mu value</label>
+                                        
                                         <input type="number" class="form-control" id="mu" value="25" name="mu">
                                     </td>
                                 <td>    
-                                        <label for="sigma" class="form-label">Sigma value</label>
+                                       
                                         <input type="number" class="form-control" id="sigma" value="8.33" name="sigma">
                                     
                                    </td> 
                                <td>     
-                                        <label for="stats" class="form-label">Statistics</label>
+                                     
                                         <input type="number" class="form-control" id="stats" value="0" name="stats">
                                    </td> 
                                <td>     
-                                        <label for="pred_stats" class="form-label">Predicted Statistics</label>
+                                   
                                         <input type="number" class="form-control" id="pred_stats" value="0" name="pred_stats">
                                     
                                     </td>
                                 <td>    
-                                        <label for="experience" class="form-label">Experience</label>
+                                      
                                         <input type="number" class="form-control" id="experience" value="0" name="experience">
                                     </td>
                                 <td>    
-                                        <label for="squad" class="form-check-label">In squad?</label>
-                                        <br>
+                                    
                                         <input type="checkbox" class="form-check-input" id="squad" name="squad">
                                         
                                     </td>
@@ -175,55 +182,53 @@
                         
                         {% for key, values in session['teams'][teamName].items() -%}
                         <tr>
+                            <form action="/update_player" method="post">
+                            <input type="hidden" name="playerName" value={{ key }}> 
                             <td> {{ key}} </td>
                             <td> {{values['mu']}} </td>
                             <td> {{values['sigma']}} </td>
                             <td> 
-                                <form action="/update_player" method="post">
-                                    <input type="hidden" name="playerName" value={{ key }}> 
+                                
+                                    
                                     <input type="number" name="updated_stat" value = {{ values['stats'] }} >
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                    </button>
-                                </form>
+                                   
+                            
                             </td>
                             <td> 
-                                <form action="/update_player" method="post">
-                                    <input type="hidden" name="playerName" value={{ key }}> 
-                                    <input type="number" name="updated_stat" value = {{ values['expected_stats']}} >
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                    </button>
-                                </form>
+                                
+                                    <input type="number" name="updated_expected_stat" value = {{ values['expected_stats']}} >
+                            
                             </td>
                             <td> 
-                                <form action="/update_player" method="post">
-                                    <input type="hidden" name="playerName" value={{ key }}> 
-                                    <input type="number" name="updated_stat" value = {{ values['experience']}} >
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="bi bi-arrow-repeat"></i>
-                                    </button>
-                                </form>
+                               
+                             
+                                    <input type="number" name="updated_experience" value = {{ values['experience']}} >
+                                   
                             </td>
                                 
                             <td> 
-                                {% if values['squad'] == 'on' %}
-                                    <i class="bi bi-check-circle"></i>
-                                {% else %}
-                                    <i class="bi bi-circle"></i>
-                                {%endif%}
+                                
+                                    <input class="form-check-input" type="checkbox" name="updated_squad" value = {{ values['squad']}} >
+                                
+                                
                             </td>
                            
                             <td> 
-                                <form action="/remove_player" method="post">
-                                    <input type="hidden" name="playerName" value={{ key }}> 
-                                    <button type="submit" class="btn btn-danger">
+                                
+                                   
+                                    <button type="submit" class="btn btn-warning" action="update">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+
+                                    <button type="submit" class="btn btn-danger" action="remove">
                                         <i class="bi bi-trash"></i>
                                     </button>
-                                </form> 
+                               
                                
                             </td>
+                        </form> 
                         </tr>
+                    
                         {% endfor %}
                     </tbody>
                 </table>
@@ -232,18 +237,11 @@
             
             {%endfor%}
 
-
             <form action="/add_team" method="POST">
                 <input type="text" name="teamName">
                 <button class=" btn btn-success">Add team</button>
             </form>
-            <form action="/calculate" method="POST" id="calculate">
-                
-                <label for="ranks" class="form-label">Rank of teams</label>
-                <input type="text" class="form-control" id="ranks" value="1,2" name="ranks">
-                <button type="submit" class="btn btn-outline-dark">Update ratings</button>
-                
-            </form>
+            
         </div>
         <div class="col"></div>
     </div>
