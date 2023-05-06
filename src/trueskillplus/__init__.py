@@ -165,48 +165,6 @@ class Trueskillplus(trueskill.TrueSkill):
         #N:M unbalanced match – [(r1,), (r2, r3, r4)] - unsupported.
         #Free-for-all – [(r1,), (r2,), (r3,), (r4,)] # ffa is same as N:N:N
 
-        
-       
-        """
-        
-
-
-        Trueskill 2 variables
-
-        points: score of each team.
-        stats: number representing some statistic of a team. cumulated from some statistic. "performance" of team.
-        model: a keras model that should predict a score difference between the teams
-        is_bestof: if the game is a best of series, it should be true
-
-        #TODO: arguments checks
-        winner_points = points[0]
-        loser_points = points[1]
-        winner_kdr = kdr_stats[0]
-        loser_kdr = kdr_stats[1]
-
-        kdr_diff = winner_kdr - loser_kdr#positive means winner had higher kdr 
-
-        
-        winner_win_probability = self.win_probability(rating_groups[0], rating_groups[1])
-        #df = df[['winner', 't1_points', 't2_points', 't1_win_probability', 'is_bestof', 'kdr_diff']]
-
-        predicted_kdr_diff = model.predict([winner_points, loser_points, winner_win_probability, 1.0, 0.0, 1.0 if is_bestof == False else 0.0, 1.0 if is_bestof == True else 0.0])
-        
-        #TODO this is gonna be a bad solution, but i dont wanna carry over tau all the time
-        # set dynamics factor according to how unlikely this result is.
-        diff = abs(kdr_diff - predicted_kdr_diff)
-
-
-        default_tau = self.tau
-
-
-        self.tau = self.tau + self.tau * diff #need to modify by some amount.
-        
-        """
-        
-    
-
-    
     def rate_1vs1(self, rating1 : Rating_plus, rating2 : Rating_plus, stats = None, expected_stats = None):
        
         rating1 = Rating_plus(rating1.mu + rating1.mu * ((1 / rating1.experience + 1) * self.experience_coeff))

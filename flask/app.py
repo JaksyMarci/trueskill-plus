@@ -18,8 +18,8 @@ import sys
 # parent directory
 import logging
 sys.path.append("..")
-#from trueskill import Rating, rate, TrueSkill
-from src.trueskillplus import Rating_plus, Trueskillplus, rate
+from trueskill import Rating, rate, TrueSkill
+#from src.trueskillplus import Rating_plus, Trueskillplus, rate
 logging.basicConfig(level=logging.INFO)
 
 # import method from sibling
@@ -138,7 +138,7 @@ def remove_team():
 @app.route('/calculate', methods=['POST'])
 def calculate():
    
-    env = Trueskillplus()  #TODO ide env
+    #env = Trueskillplus()  #TODO ide env
     print(request.form)
     s = dict(session['teams'].items())
 
