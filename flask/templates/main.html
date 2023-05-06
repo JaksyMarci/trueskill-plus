@@ -106,23 +106,24 @@
                         {% for key, values in session['teams'][teamName].items() -%}
                         <tr>
                             <form action="/update_player" method="post">
-                                <input type="hidden" name="teamName" value={{ teamName }}>
+                                <input type="hidden" name="team" value= "{{ teamName }}" >
                                 <input type="hidden" name="playerName" value={{ key }}>
                                 <td> {{ key}} </td>
                                 <td> {{values['mu']}} </td>
                                 <td> {{values['sigma']}} </td>
                                 <td>
-                                    <input type="number" name="stat" value={{ values['stats'] }}>
+                                    <input type="number" name="stats" value={{ values['stats'] }}>
                                 </td>
                                 <td>
-                                    <input type="number" name="expected_stat" value={{
-                                        values['expected_stats']}}>
+                                    <input type="number" name="pred_stats" value={{
+                                        values['pred_stats']}}>
                                 </td>
                                 <td>
                                     <input type="number" name="experience" value={{ values['experience']}}>
                                 </td>
                                 <td>
-                                    <input class="form-check-input" type="checkbox" name="squad" value={{ values['squad'] }}>
+                                    <input class="form-check-input" type="checkbox" name="squad" value="on"
+                                    {% if 'squad' in values %} checked {%endif%}>
                                 </td>
                                 <td>
                                     <button type="submit" class="btn btn-warning" name="action" value="update">

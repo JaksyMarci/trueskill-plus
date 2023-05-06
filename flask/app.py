@@ -57,24 +57,25 @@ def index():
 
 @app.route('/add_player', methods=['POST'])
 def add_player():
-    
-    
-    print('got from form: ', request.form)
-
+    #print(request.form)
     s = dict(session['teams'].items())
+    
     team = request.form['team']
+ 
     playerName = request.form['playerName']
     s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
-
+    
     s[team][playerName]['mu'] = request.form['mu']
     s[team][playerName]['sigma'] = request.form['sigma']
     s[team][playerName]['stats'] = request.form['stats']
     s[team][playerName]['pred_stats'] = request.form['pred_stats']
     s[team][playerName]['experience'] = request.form['experience']
+
     if 'squad' in request.form:
         s[team][playerName]['squad'] = 'on'
     else:
         s[team][playerName]['squad'] = 'off'
+   
     return render_template('main.html')
 
 
@@ -88,7 +89,7 @@ def manage():
 @app.route('/calculate', methods=['POST'])
 def calculate():
    
-    request.form
+    
     print('RANKS: ', request.form)
     s = dict(session['teams'].items())
     print('CALCULATING: ', s)
@@ -147,29 +148,27 @@ def update_player():
     if request.form['action'] == 'remove':
 
         s = dict(session['teams'])
-        
-        print(s)
-    
-
-        for teams, teamMembers in s.items():
-            teamMembers.pop(request.form['playerName'], '')
+        team = request.form['team']
+        playerName = request.form['playerName']
+        s[team].pop(playerName, '')
 
         
     elif request.form['action'] == 'update':
-
+        #print(request.form)
+        s = dict(session['teams'].items())
         
-        s = dict(session['teams'])
         team = request.form['team']
+    
         playerName = request.form['playerName']
-        s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
-
-        s[team][playerName]['mu'] = request.form['mu']
-        s[team][playerName]['sigma'] = request.form['sigma']
+        
         s[team][playerName]['stats'] = request.form['stats']
         s[team][playerName]['pred_stats'] = request.form['pred_stats']
         s[team][playerName]['experience'] = request.form['experience']
-        s[team][playerName]['squad'] = request.form['squad']
 
+        if 'squad' in request.form:
+            s[team][playerName]['squad'] = 'on'
+        else:
+            s[team][playerName]['squad'] = 'off'
 
     
     return render_template('main.html')
