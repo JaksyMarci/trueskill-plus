@@ -17,7 +17,6 @@
 </style>
 
 <body>
-
     <div class="container">
         <div class="col sidecolumn"></div>
         <div class="col">
@@ -39,7 +38,6 @@
 
             <img src="data:image/png;base64, {{ session['img'] }} " />
 
-
             <form action="/calculate" method="POST" id="calculate">
 
                 <label for="ranks" class="form-label">Rank of teams</label>
@@ -50,73 +48,12 @@
 
             {% for teamName, teamMembers in session['teams'].items() -%}
 
-
             <h2>{{teamName}} </h2>
             <form action="/remove_team" method="POST">
                 <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
                 <input type="submit" id="remove_team" class="btn btn-danger" value="Remove team">
             </form>
 
-
-
-
-
-
-
-
-
-
-
-            <!--
-            <div class="form-group">
-                <form action="/add_player" method="POST" class="form-inline">
-                    <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
-                    <div class="row">
-                        
-                        <div class="col">
-                            <label for="playerName" class="form-label">Player name</label>
-                            <input type="text" class="form-control" id="playerName" name="playerName">
-                        </div>
-                        <div class="col">
-                            <label for="mu" class="form-label">Mu value</label>
-                            <input type="number" class="form-control" id="mu" value="25" name="mu">
-                        </div>
-                        <div class="col">
-                            <label for="sigma" class="form-label">Sigma value</label>
-                            <input type="number" class="form-control" id="sigma" value="8.33" name="sigma">
-                        </div>
-                        
-                        <div class="col">
-                            <label for="stats" class="form-label">Statistics</label>
-                            <input type="number" class="form-control" id="stats" value="0" name="stats">
-                        </div>
-                        <div class="col">
-                            <label for="pred_stats" class="form-label">Predicted Statistics</label>
-                            <input type="number" class="form-control" id="pred_stats" value="0" name="pred_stats">
-                        </div>
-                        
-                        <div class="col">
-                            <label for="experience" class="form-label">Experience</label>
-                            <input type="number" class="form-control" id="experience" value="0" name="experience">
-                        </div>
-                        <div class="col">
-                            <label for="squad" class="form-check-label">In squad?</label>
-                            <br>
-                            <input type="checkbox" class="form-check-input" id="squad" name="squad">
-                            
-                        </div>
-                        <div class="col">
-                            <label for="addPlayer" class="form-label"> </label>
-                            <input type="submit" id="addPlayer" class="form-control btn btn-primary" value="Add player">
-                        </div>
-                        
-                    </div>
-                    
-                    
-                    
-                </form>
-            </div>
-            -->
             <div class="table-responsive">
                 <table class="table table-bordered table-striped table-hover align-middle">
                     <thead class="table-primary">
@@ -130,136 +67,91 @@
                         <th></th>
                     </thead>
                     <tbody>
-
-
                         <tr>
-
-
                             <div class="form-group">
                                 <form action="/add_player" method="POST" class="form-inline">
                                     <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
                                     <td>
-
-
-
                                         <input type="text" class="form-control" id="playerName" name="playerName">
-
                                     </td>
                                     <td>
-
                                         <input type="number" class="form-control" id="mu" value="25" name="mu">
                                     </td>
                                     <td>
-
                                         <input type="number" class="form-control" id="sigma" value="8.33" name="sigma">
-
                                     </td>
                                     <td>
-
                                         <input type="number" class="form-control" id="stats" value="0" name="stats">
                                     </td>
                                     <td>
-
                                         <input type="number" class="form-control" id="pred_stats" value="0"
                                             name="pred_stats">
-
                                     </td>
                                     <td>
-
                                         <input type="number" class="form-control" id="experience" value="0"
                                             name="experience">
                                     </td>
                                     <td>
-
                                         <input type="checkbox" class="form-check-input" id="squad" name="squad">
-
                                     </td>
                                     <td>
                                         <label for="addPlayer" class="form-label"> </label>
                                         <input type="submit" id="addPlayer" class="form-control btn btn-primary"
                                             value="Add player">
-
-
+                                    </td>
+                                </form>
                             </div>
+                        </tr>
 
+                        {% for key, values in session['teams'][teamName].items() -%}
+                        <tr>
+                            <form action="/update_player" method="post">
+                                <input type="hidden" name="playerName" value={{ key }}>
+                                <td> {{ key}} </td>
+                                <td> {{values['mu']}} </td>
+                                <td> {{values['sigma']}} </td>
+                                <td>
+                                    <input type="number" name="updated_stat" value={{ values['stats'] }}>
+                                </td>
+                                <td>
+                                    <input type="number" name="updated_expected_stat" value={{
+                                        values['expected_stats']}}>
+                                </td>
+                                <td>
+                                    <input type="number" name="updated_experience" value={{ values['experience']}}>
+                                </td>
+                                <td>
+                                    <input class="form-check-input" type="checkbox" name="updated_squad" value={{
+                                        values['squad']}}>
+                                </td>
+                                <td>
+                                    <button type="submit" class="btn btn-warning" action="update">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
 
-
+                                    <button type="submit" class="btn btn-danger" action="remove">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
                             </form>
                         </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-
-            {% for key, values in session['teams'][teamName].items() -%}
-            <tr>
-                <form action="/update_player" method="post">
-                    <input type="hidden" name="playerName" value={{ key }}>
-                    <td> {{ key}} </td>
-                    <td> {{values['mu']}} </td>
-                    <td> {{values['sigma']}} </td>
-                    <td>
-
-
-                        <input type="number" name="updated_stat" value={{ values['stats'] }}>
-
-
-                    </td>
-                    <td>
-
-                        <input type="number" name="updated_expected_stat" value={{ values['expected_stats']}}>
-
-                    </td>
-                    <td>
-
-
-                        <input type="number" name="updated_experience" value={{ values['experience']}}>
-
-                    </td>
-
-                    <td>
-
-                        <input class="form-check-input" type="checkbox" name="updated_squad" value={{ values['squad']}}>
-
-
-                    </td>
-
-                    <td>
-
-
-                        <button type="submit" class="btn btn-warning" action="update">
-                            <i class="bi bi-arrow-repeat"></i>
-                        </button>
-
-                        <button type="submit" class="btn btn-danger" action="remove">
-                            <i class="bi bi-trash"></i>
-                        </button>
-
-
-                    </td>
-                </form>
-            </tr>
-
-            {% endfor %}
-            </tbody>
-            </table>
+            {%endfor%}
+            <form action="/add_team" method="POST">
+                <input type="text" name="teamName">
+                <button class=" btn btn-success">Add team</button>
+            </form>
         </div>
-
-
-        {%endfor%}
-
-        <form action="/add_team" method="POST">
-            <input type="text" name="teamName">
-            <button class=" btn btn-success">Add team</button>
-        </form>
-
+        <div class="col"></div>
     </div>
-    <div class="col"></div>
-    </div>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
-        crossorigin="anonymous"></script>
-
-
-</body>
+        crossorigin="anonymous">
+    </script>
+    </body>
 
 </html>
