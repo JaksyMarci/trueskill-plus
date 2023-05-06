@@ -129,6 +129,7 @@ class Trueskillplus(trueskill.TrueSkill):
                 #calculate experience offset
                 if r.experience in self.experience_coeffs:
                     experience_offset = self.experience_coeffs[r.experience]
+
                     
                 
                 else:
@@ -140,7 +141,8 @@ class Trueskillplus(trueskill.TrueSkill):
                                             r.mu * experience_offset,
                                             r.sigma + stat_offset,
                                             r.experience))
-                team_experiences.append(r.experience + 1)
+                team_experiences.append(r.experience) 
+
                 
                 #r : trueskillplus rating
                 #s : stat number
@@ -151,7 +153,6 @@ class Trueskillplus(trueskill.TrueSkill):
             i+=1
 
         print(new_ratings)
-        #TODO bad bc returns classic ts object, losing experience data
 
         
 

@@ -31,7 +31,7 @@ logging.basicConfig(level=logging.INFO)
 use('agg')  # MATPLOTLIB IS NOT THREAD SAFE.
 
 app = Flask(__name__)
-app.secret_key = 'any random string'
+app.secret_key = 'SECRET_KEY'
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
@@ -80,11 +80,54 @@ def add_player():
 
 
 
-@app.route('/manage', methods=['GET','POST'])
-def manage():
-    #logging.info(request.form)
-    return render_template('manage.html')
 
+@app.route('/update_player', methods=['POST'])
+def update_player():
+    
+    print(request.form)
+    if request.form['action'] == 'remove':
+
+        s = dict(session['teams'])
+        team = request.form['team']
+        playerName = request.form['playerName']
+        s[team].pop(playerName, '')
+
+        
+    elif request.form['action'] == 'update':
+        #print(request.form)
+        s = dict(session['teams'].items())
+        
+        team = request.form['team']
+    
+        playerName = request.form['playerName']
+        
+        s[team][playerName]['stats'] = request.form['stats']
+        s[team][playerName]['pred_stats'] = request.form['pred_stats']
+        s[team][playerName]['experience'] = request.form['experience']
+
+        if 'squad' in request.form:
+            s[team][playerName]['squad'] = 'on'
+        else:
+            s[team][playerName]['squad'] = 'off'
+
+    
+    return render_template('main.html')
+
+
+@app.route('/add_team', methods=['POST'])
+def add_team():
+
+    session['teams'][request.form['teamName']] = {}
+
+    return render_template('main.html')
+
+
+@app.route('/remove_team', methods=['POST'])
+def remove_team():
+
+    session['teams'].pop(request.form['team'])
+
+    return render_template('main.html')
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
@@ -141,53 +184,12 @@ def calculate():
     return render_template('main.html')
 
 
-@app.route('/update_player', methods=['POST'])
-def update_player():
-    
-    print(request.form)
-    if request.form['action'] == 'remove':
-
-        s = dict(session['teams'])
-        team = request.form['team']
-        playerName = request.form['playerName']
-        s[team].pop(playerName, '')
-
-        
-    elif request.form['action'] == 'update':
-        #print(request.form)
-        s = dict(session['teams'].items())
-        
-        team = request.form['team']
-    
-        playerName = request.form['playerName']
-        
-        s[team][playerName]['stats'] = request.form['stats']
-        s[team][playerName]['pred_stats'] = request.form['pred_stats']
-        s[team][playerName]['experience'] = request.form['experience']
-
-        if 'squad' in request.form:
-            s[team][playerName]['squad'] = 'on'
-        else:
-            s[team][playerName]['squad'] = 'off'
-
-    
-    return render_template('main.html')
 
 
-@app.route('/remove_team', methods=['POST'])
-def remove_team():
-
-    session['teams'].pop(request.form['team'])
-
-    return render_template('main.html')
-
-
-@app.route('/add_team', methods=['POST'])
-def add_team():
-
-    session['teams'][request.form['teamName']] = {}
-
-    return render_template('main.html')
+@app.route('/manage', methods=['GET','POST'])
+def manage():
+    #logging.info(request.form)
+    return render_template('manage.html')
 
 
 if __name__ == '__main__':
