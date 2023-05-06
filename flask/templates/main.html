@@ -45,11 +45,7 @@
                             
                         </div>
                         
-                        <div class="col">
-                            <label for="rank" class="form-label">Rank</label>
-                            <input type="number" name="rank" value="">
-                            
-                        </div>
+                    
 
                         <div class="col">
                             <form action="/remove_team" method="POST">
@@ -118,6 +114,9 @@
                         <th>Name</th>
                         <th>Mu</th>
                         <th>Sigma</th>
+                        <th>Stats</th>
+                        <th>Expected stats</th>
+                        <th>Experience</th>
                         <th></th>
                     </thead>
                     <tbody>
@@ -127,7 +126,10 @@
                             <td> {{ key}} </td>
                             <td> {{values['mu']}} </td>
                             <td> {{values['sigma']}} </td>
-                            <td> <form action="/remove_player" method="post"  ><input type="hidden" name="playerName" value={{ key }}> <input type="submit" class="btn btn-outline-danger" value="Remove"></form> </td>
+                            <td> {{ values['stats']}} </td>
+                            <td> {{ values['expected_stats']}} </td>
+                            <td> {{ values['experience']}} </td>
+                            <td> <form action="/remove_player" method="post"><input type="hidden" name="playerName" value={{ key }}> <input type="submit" class="btn btn-outline-danger" value="Remove"></form> </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -154,7 +156,6 @@
     </div>
     
     
-    <img class="img-fluid" src='data:image/png;base64,{{ data }}'/>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
     
 
