@@ -58,7 +58,7 @@
                         {% for i in range(5):%}
                         <td>
 
-                           <input type="number" min="0.0" max="0.9999" value={{session['experience_coefficients'][i+1]}} step="0.0001" class="form-control" id="experience_coefficient_{{i}}" name="experience_{{i+1}}" required>
+                           <input type="number" min="0.0" max="0.9999" value={{session['env']['experience_coefficients'][i+1]}} step="0.0001" class="form-control" id="experience_coefficient_{{i}}" name="experience_{{i+1}}" required>
                            
                         </td>
                         {%endfor%}
@@ -84,7 +84,7 @@
                         {% for i in range(5):%}
                         <td>
 
-                           <input type="number" min="0.0" max="0.9999" value={{session['squad_coefficients'][i+1]}} step="0.0001" class="form-control" id="squad_coefficient_{{i}}" name="squad_coefficient_{{i+1}}" required>
+                           <input type="number" min="0.0" max="0.9999" value={{session['env']['squad_coefficients'][i+1]}} step="0.0001" class="form-control" id="squad_coefficient_{{i}}" name="squad_coefficient_{{i+1}}" required>
                            
                         </td>
                         {%endfor%}
