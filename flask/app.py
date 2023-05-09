@@ -65,7 +65,11 @@ def index():
                 3:0,
                 4:0,
                 5:0
-            },
+            }
+
+        },
+        'data': {
+            'played_matches_count' : 0
 
         }
         
@@ -227,7 +231,7 @@ def calculate():
     rated_flat = [item for sublist in rated for item in sublist]  # flatten
 
     # dict items are ordered since python 3.6!
-
+    
     i = 0
     for teams, teamMembers in s.items():
         for member, rating in teamMembers.items():
@@ -236,6 +240,7 @@ def calculate():
             rating['sigma'] = rated_flat[i].sigma
             i += 1
 
+    
     # make figure
     # MAY BE UNSAFE
     plt.clf()
@@ -247,6 +252,7 @@ def calculate():
             plt.plot(x_axis, 100 * norm.pdf(
                 x_axis, values['mu'], values['sigma']), scalex=1.5, animated=True)
             labels.append(teamMember)
+
     plt.legend(labels)
     plt.xlabel('Rating')
     plt.ylabel('Probability of rating %')
@@ -258,7 +264,21 @@ def calculate():
     session['img'] = data
 
     plt.clf()
+
+    played_matches_count = session['data']['played_matches_count']
+    session['data'][played_matches_count + 1] = [x.mu for x in rated_flat] 
+    x_axis = np.arange(0, played_matches_count, 1)
     
+    for i in range(played_matches_count):
+        plt.plot(x_axis, session['data'][played_matches_count])
+
+    plt.legend(labels)
+    buf = BytesIO()
+    plt.savefig(buf, format="png")
+    # Embed the result in the html output.
+    data = base64.b64encode(buf.getbuffer()).decode("ascii")
+    session['img2'] = data
+
     return render_template('main.html')
 
 

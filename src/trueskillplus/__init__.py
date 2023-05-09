@@ -47,7 +47,7 @@ class Trueskillplus(trueskill.TrueSkill):
         else:
             self.experience_coeffs = experience_coeffs
         if squad_coeffs is None:
-            self.squad_coeffs = {1:0, 2:0.01, 3:0.02, 4:0.03, 5:0.04, 6:0.05, 7:0.06, 8:0.07, 9:0.08, 10:0.1}   
+            self.squad_coeffs = {1:0, 2:0.01, 3:0.02, 4:0.03, 5:0.05}  
         else:
             self.squad_coeffs = squad_coeffs
             #TODO validate this.
