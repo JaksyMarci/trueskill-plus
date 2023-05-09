@@ -257,6 +257,8 @@ def calculate():
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
     session['img'] = data
 
+    plt.clf()
+    
     return render_template('main.html')
 
 
