@@ -44,9 +44,21 @@
 
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <ul class=flashes >
-                        {% for message in messages %}
-                            <li class="list-group-item list-group-item-danger">{{ message }}</li>
+                    <ul class="flashes list-group" >
+                        {% for category, message in messages %}
+                            {% if category == 'error'%}
+                                <li class="list-group-item list-group-item-danger">{{ message }}</li>
+                            {%endif%}
+                            {% if category == 'warning'%}
+                                <li class="list-group-item list-group-item-warning">{{ message }}</li>
+                            {%endif%}
+                            {% if category == 'info'%}
+                                <li class="list-group-item list-group-item-info">{{ message }}</li>
+                            {%endif%}
+                            {% if category == 'message'%}
+                                <li class="list-group-item list-group-item-primary">{{ message }}</li>
+                            {%endif%}
+                            
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -76,7 +88,7 @@
                         <th>Name</th>
                         <th>Mu</th>
                         <th>Sigma</th>
-                        <th>Stats</th>
+                        <th>Statistics</th>
                         <th>Expected statistics</th>
                         <th>Experience</th>
                         <th>In squad?</th>

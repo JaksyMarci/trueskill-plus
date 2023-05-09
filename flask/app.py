@@ -103,7 +103,7 @@ def add_player():
         s[team][playerName]['squad'] = 'on'
     else:
         s[team][playerName]['squad'] = 'off'
-   
+    
     return render_template('main.html')
 
 
@@ -138,7 +138,7 @@ def update_player():
         else:
             s[team][playerName]['squad'] = 'off'
 
-    
+    flash('Player updated successfully', category='info')
     return render_template('main.html')
 
 
@@ -203,8 +203,10 @@ def calculate():
         squads.append(squad_count)
 
     print("Rating the following:\n", ratings)
-    if env.quality(rating_groups=ratings) < 0.5:
-        flash('This match did not seem to be too fair...')
+   
+    if env.quality(rating_groups=ratings) < 0.2:
+ 
+        flash(f'This match did not seem to be too fair...',category='warning')
 
     try:
         rated = env.rate(rating_groups=ratings, 
@@ -214,8 +216,8 @@ def calculate():
                      squads=squads )
     
     except Exception as e:
-        flash("Error determining ratings!")
-        flash(str(e))
+        flash("Error determining ratings!", category='error')
+        flash(str(e), category='error')
         return render_template('main.html')
 
     
@@ -273,6 +275,7 @@ def manage():
             session['env']['experience_coefficients'][i+1] = request.form[f'experience_{i+1}']
         
         print(session)
+        flash('The Trueskill-plus settings were updated', category='info')
         return render_template('main.html')
     elif request.method == 'GET':
         
