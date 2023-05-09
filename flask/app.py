@@ -83,7 +83,8 @@ def index():
 
 @app.route('/main', methods=['GET','POST'])
 def index_main():
-    print("\nCurrent session: \n", dict(session.items()))
+    
+    #print("\nCurrent session: \n", dict(session.items()))
     return render_template('main.html')
 
 
@@ -264,12 +265,14 @@ def calculate():
     session['img'] = data
 
     plt.clf()
-
+    session['data']['played_matches_count']+=1
     played_matches_count = session['data']['played_matches_count']
-    session['data'][played_matches_count + 1] = [x.mu for x in rated_flat] 
+    """
+    session['data'][played_matches_count] = [x.mu for x in rated_flat] 
     x_axis = np.arange(0, played_matches_count, 1)
     
     for i in range(played_matches_count):
+        print(session['data'][played_matches_count])
         plt.plot(x_axis, session['data'][played_matches_count])
 
     plt.legend(labels)
@@ -278,7 +281,7 @@ def calculate():
     # Embed the result in the html output.
     data = base64.b64encode(buf.getbuffer()).decode("ascii")
     session['img2'] = data
-
+    """
     return render_template('main.html')
 
 
