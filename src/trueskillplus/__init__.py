@@ -43,11 +43,11 @@ class Trueskillplus(trueskill.TrueSkill):
         #experience coeff (both add to mu)
         self.stat_coeff = stat_coeff
         if experience_coeffs is None:
-            self.experience_coeffs = {0:0.005, 1:0.004, 2:0.002}
-        self.experience_coeff = experience_coeffs
+            self.experience_coeffs = {0:0.005, 1:0.004, 2:0.002,3:0.001, 4:0.0, 5:0.0}
+        else:
+            self.experience_coeffs = experience_coeffs
         if squad_coeffs is None:
-            self.squad_coeffs = {1:0, 2:0.01, 3:0.02, 4:0.03, 5:0.04, 6:0.05, 7:0.06, 8:0.07, 9:0.08, 10:0.1}
-            
+            self.squad_coeffs = {1:0, 2:0.01, 3:0.02, 4:0.03, 5:0.04, 6:0.05, 7:0.06, 8:0.07, 9:0.08, 10:0.1}   
         else:
             self.squad_coeffs = squad_coeffs
             #TODO validate this.
@@ -82,7 +82,11 @@ class Trueskillplus(trueskill.TrueSkill):
             if not (all(len(item1) == len(item2) and len(item1) == len(item3) for item1, item2, item3 in zip(rating_groups, stats, expected_stats))):
                 logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
                 return None
-        
+        else:
+            stats = []
+            expected_stats = []
+            
+
         for i, team in enumerate(rating_groups[:-1]):
             next_team = rating_groups[i+1]
             if (len(team) != len(next_team)):
@@ -94,16 +98,22 @@ class Trueskillplus(trueskill.TrueSkill):
         for team_tuple in rating_groups:
             
             team_avg = 0
-           
+            default_stat = []
+            default_expected_stat = []
             for r in team_tuple:
                 team_avg+=r.mu
-                
+                default_stat.append(0)
+                default_expected_stat.append(0)
+            
+            stats.append(tuple(default_stat))
+            expected_stats.append(tuple(default_expected_stat))
             average_ratings.append(team_avg / len(team_tuple))
 
         i = 0
         new_ratings = []
         experiences = []
 
+        print(rating_groups, '\n', stats, '\n', expected_stats, '\n')
         for team_tuple, stat_tuple, expected_stat_tuple in zip(rating_groups, stats, expected_stats):
             new_team = []
             team_experiences = []
@@ -111,7 +121,7 @@ class Trueskillplus(trueskill.TrueSkill):
             for r, s, es in zip(team_tuple, stat_tuple, expected_stat_tuple):
                 
                 #caluclate individual statistics
-                stat_diff = abs(s-es)
+                stat_diff = s-es
                 rating_diff = abs(
                     r.mu - 
                     (sum(average_ratings[:i] + average_ratings[i+1:]) / len(average_ratings[:i] + average_ratings[i+1:]))
@@ -121,20 +131,21 @@ class Trueskillplus(trueskill.TrueSkill):
                 
                 #calculate squad offset
                 if squads[i] in self.squad_coeffs:
-                    squad_offset = self.squad_coeffs[squads[i]]
+                    squad_offset = float(self.squad_coeffs[squads[i]])
                 
                 else:
                     squad_offset = 0
 
                 #calculate experience offset
                 if r.experience in self.experience_coeffs:
-                    experience_offset = self.experience_coeffs[r.experience]
+                    experience_offset = float(self.experience_coeffs[r.experience])
 
                     
                 
                 else:
                     experience_offset = 0
 
+     
                 print(r.mu, r.mu * squad_offset, r.mu * experience_offset, r.sigma + stat_offset)
                 new_team.append(Rating_plus(r.mu +
                                             r.mu * squad_offset +
@@ -165,6 +176,7 @@ class Trueskillplus(trueskill.TrueSkill):
         #N:M unbalanced match – [(r1,), (r2, r3, r4)] - unsupported.
         #Free-for-all – [(r1,), (r2,), (r3,), (r4,)] # ffa is same as N:N:N
 
+    #TODO: 
     def rate_1vs1(self, rating1 : Rating_plus, rating2 : Rating_plus, stats = None, expected_stats = None):
        
         rating1 = Rating_plus(rating1.mu + rating1.mu * ((1 / rating1.experience + 1) * self.experience_coeff))

@@ -1,5 +1,5 @@
 
-from flask import Flask, render_template, request, session, json
+from flask import Flask, render_template, request, session, flash
 from flask_session import Session
 
 import base64
@@ -18,8 +18,8 @@ import sys
 # parent directory
 import logging
 sys.path.append("..")
-from trueskill import Rating, rate, TrueSkill
-#from src.trueskillplus import Rating_plus, Trueskillplus, rate
+#from trueskill import Rating, rate, TrueSkill
+from src.trueskillplus import Rating_plus, Trueskillplus, rate
 logging.basicConfig(level=logging.INFO)
 
 # import method from sibling
@@ -32,7 +32,6 @@ use('agg')  # MATPLOTLIB IS NOT THREAD SAFE.
 
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
-app.config["SESSION_PERMANENT"] = False #TODO change this to ture
 app.config["SESSION_TYPE"] = "filesystem" #TODO change this to null
 Session(app)
 
@@ -46,7 +45,30 @@ def index():
             'Team 1': {},
             'Team 2': {}
         },
-        'env':{}
+        'env':{
+            'mu' : 25,
+            'sigma' : round(25/3,4),
+            'beta' : round(25/6,4),
+            'tau' : round(25/300,4),
+            'draw_probability' : 0.1,
+            'stat_coefficient' : 0,
+            'experience_coefficients' : {
+                1:0,
+                2:0,
+                3:0,
+                4:0,
+                5:0
+            },
+            'squad_coefficients' : {
+                1:0,
+                2:0,
+                3:0,
+                4:0,
+                5:0
+            },
+
+        }
+        
 
     })
     session.pop('img', '')
@@ -71,11 +93,11 @@ def add_player():
     playerName = request.form['playerName']
     s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
     
-    s[team][playerName]['mu'] = request.form['mu']
-    s[team][playerName]['sigma'] = request.form['sigma']
-    s[team][playerName]['stats'] = request.form['stats']
-    s[team][playerName]['pred_stats'] = request.form['pred_stats']
-    s[team][playerName]['experience'] = request.form['experience']
+    s[team][playerName]['mu'] = float(request.form['mu'])
+    s[team][playerName]['sigma'] = float(request.form['sigma'])
+    s[team][playerName]['stats'] = float(request.form['stats'])
+    s[team][playerName]['pred_stats'] = float(request.form['pred_stats'])
+    s[team][playerName]['experience'] = int(request.form['experience'])
 
     if 'squad' in request.form:
         s[team][playerName]['squad'] = 'on'
@@ -137,23 +159,53 @@ def remove_team():
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
-   
-    #env = Trueskillplus()  #TODO ide env
     print(request.form)
+    print(session)
+    
+    if 'env' in session:
+        s = session['env']
+        #TODO add mu and sigma
+        env = Trueskillplus(beta=float(s['beta']), 
+                            tau=float(s['tau']), 
+                            draw_probability=float(s['draw_probability']), 
+                            experience_coeffs=dict(s['experience_coefficients']), 
+                            squad_coeffs=dict(s['squad_coefficients']),
+                            stat_coeff=float(s['stat_coefficient']))
+    else:
+        env = Trueskillplus()
+    print(env)
     s = dict(session['teams'].items())
 
     ratings = []
+    stats = []
+    expected_stats = []
+    squads=[]
     for teamName, teamMembers in s.items():
-        playerRating = []
-
+        player_rating = []
+        player_stat = []
+        player_expected_stat = []
+        squad_count = 0
         for member, rating in teamMembers.items():
 
-            playerRating.append(
-                Rating(mu=float(rating['mu']), sigma=float(rating['sigma'])))
+            player_rating.append(
+                Rating_plus(mu=float(rating['mu']), sigma=float(rating['sigma']), experience=float(rating['experience'])))
+            
+            player_stat.append(float(s[teamName][member]['stats']))
+            player_expected_stat.append(float(s[teamName][member]['pred_stats']))
+            if s[teamName][member]['squad'] == 'on':
+                squad_count+=1
 
-        ratings.append(playerRating)
+        ratings.append(tuple(player_rating))
+        stats.append(tuple(player_stat))
+        expected_stats.append(tuple(player_expected_stat))
+        squads.append(squad_count)
 
-    rated = rate(ratings)
+    print("Rating the following:\n", ratings)
+    rated = env.rate(rating_groups=ratings, 
+                     ranks=request.form['ranks'].split(','), 
+                     stats=stats, 
+                     expected_stats=expected_stats, 
+                     squads=squads )
 
     rated_flat = [item for sublist in rated for item in sublist]  # flatten
 
@@ -170,11 +222,11 @@ def calculate():
     # make figure
     # MAY BE UNSAFE
     plt.clf()
-    session.pop('img', '')
+   
     x_axis = np.arange(0, 50, 0.01)
-    for teanName, teamMember in s.items():
+    for teamName, teamMember in s.items():
         for teamMember, values in teamMember.items():
-            # invent some clever colors here
+            # TODO invent some clever colors here
             plt.plot(x_axis, norm.pdf(
                 x_axis, values['mu'], values['sigma']), scalex=1.5, animated=True)
 
@@ -196,17 +248,21 @@ def manage():
     if request.method == 'POST':
         
             
-        
+        session['env'] = {}
         session['env']['beta'] = request.form['beta']
         session['env']['tau'] = request.form['tau']
         session['env']['draw_probability'] = request.form['draw_probability']
         session['env']['stat_coefficient'] = request.form['stat_coefficient']
+        session['env']['squad_coefficients'] = {}
+        session['env']['experience_coefficients'] = {}
         for i in range(5):
-            session['env'][f'squad_coefficient_{i+1}'] = request.form[f'squad_coefficient_{i+1}']
-            session['env'][f'experience_{i+1}'] = request.form[f'experience_{i+1}']
+            session['env']['squad_coefficients'][i+1] = request.form[f'squad_coefficient_{i+1}']
+            session['env']['experience_coefficients'][i+1] = request.form[f'experience_{i+1}']
         
+        print(session)
         return render_template('main.html')
     elif request.method == 'GET':
+        
         return render_template('manage.html')
     
 
