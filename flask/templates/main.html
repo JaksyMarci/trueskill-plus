@@ -36,6 +36,16 @@
                 </div>
             </nav>
 
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class=flashes >
+                        {% for message in messages %}
+                            <li class="list-group-item-danger">{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+
             <img src="data:image/png;base64, {{ session['img'] }} " />
 
             <form action="/calculate" method="POST" id="calculate">

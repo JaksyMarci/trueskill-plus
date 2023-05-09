@@ -201,11 +201,18 @@ def calculate():
         squads.append(squad_count)
 
     print("Rating the following:\n", ratings)
-    rated = env.rate(rating_groups=ratings, 
+    try:
+        rated = env.rate(rating_groups=ratings, 
                      ranks=request.form['ranks'].split(','), 
                      stats=stats, 
                      expected_stats=expected_stats, 
                      squads=squads )
+    
+    except:
+        flash("Error determining ratings!")
+        return render_template('main.html')
+
+    
 
     rated_flat = [item for sublist in rated for item in sublist]  # flatten
 
