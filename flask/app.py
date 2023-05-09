@@ -266,6 +266,8 @@ def manage():
         
             
         session['env'] = {}
+        session['env']['mu'] = request.form['mu']
+        session['env']['sigma'] = request.form['sigma']
         session['env']['beta'] = request.form['beta']
         session['env']['tau'] = request.form['tau']
         session['env']['draw_probability'] = request.form['draw_probability']
