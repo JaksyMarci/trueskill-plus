@@ -33,12 +33,12 @@
             <form method="POST">
                   <div class="form-group">
                     <label for="mu">Mean value (mu)</label>
-                    <input type="number" min="0.0001" value={{session['env']['mu']}} step="0.0001" class="form-control" id="mu" name="mu" required>
+                    <input type="number" min="0.0001" value={{session['env']['mu']}} step="0.01" class="form-control" id="mu" name="mu" required>
                     <small class="form-text">The default average rating of a player. This number represents an individual's skill.</small>
                   </div>
                   <div class="form-group">
                     <label for="sigma">Variance value (sigma)</label>
-                    <input type="number" min="1" value={{session['env']['sigma']}} step="0.0001" class="form-control" id="sigma" name="sigma" required>
+                    <input type="number" min="1" value={{session['env']['sigma']}} step="0.01" class="form-control" id="sigma" name="sigma" required>
                     <small class="form-text">The default variance of the rating of a player. Represents Trueskill's certainity in how accurate someone's skill rating is - lower means more certain. The recommended value is third of Mu.</small>
                   </div>
                   <div class="form-group">
@@ -53,12 +53,12 @@
                   </div>
                   <div class="form-group">
                     <label for="draw_probability">Draw probability</label>
-                    <input type="number" min="0.0" max="0.9999" value={{session['env']['draw_probability']}} step="0.0001" class="form-control" id="draw_probability" name="draw_probability" required>
-                    <small class="form-text">The draw probability between two teams. If it is a float, the game has fixed draw probability. Otherwise, the draw probability will be decided dynamically per each match.</small>
+                    <input type="number" min="0.0" max="0.9999" value={{session['env']['draw_probability']}} step="0.01" class="form-control" id="draw_probability" name="draw_probability" required>
+                    <small class="form-text">The draw probability between two teams. If a value other than zero is set, the game has fixed draw probability. Otherwise, the draw probability will be decided dynamically per each match.</small>
                   </div>
                   <div class="form-group">
                     <label for="stat_coefficient">Statistics coefficient</label>
-                    <input type="number" min="0.0" max="0.9999" value={{session['env']['stat_coefficient']}} step="0.0001" class="form-control" id="stat_coefficient" name="stat_coefficient" required>
+                    <input type="number" min="0.0" value={{session['env']['stat_coefficient']}} step="0.01" class="form-control" id="stat_coefficient" name="stat_coefficient" required>
                     <small class="form-text">Represents how much a certain statistic difference (e.g. player score, kill count, team goals etc.) between two players or teams should matter in the matchmaking process. Enter zero if you wish to opt out of this feature.</small>
                   </div>
                   <table>
