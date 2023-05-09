@@ -91,10 +91,10 @@
                                         <input type="text" class="form-control" id="playerName" name="playerName">
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control" id="mu" value="25" name="mu" min="0.0" step="0.0001">
+                                        <input type="number" class="form-control" id="mu" value={{session['env']['mu']}} name="mu" min="0.0" step="0.0001" readonly>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control" id="sigma" value="8.33" name="sigma" min="0.0" step="0.0001">
+                                        <input type="number" class="form-control" id="sigma" value={{session['env']['sigma']}} name="sigma" min="0.0" step="0.0001" readonly>
                                     </td>
                                     <td>
                                         <input type="number" class="form-control" id="stats" value="0" name="stats">

@@ -165,7 +165,9 @@ def calculate():
     if 'env' in session:
         s = session['env']
         #TODO add mu and sigma
-        env = Trueskillplus(beta=float(s['beta']), 
+        env = Trueskillplus(mu=float(s['mu']),
+                            sigma=float(s['sigma']),
+                            beta=float(s['beta']), 
                             tau=float(s['tau']), 
                             draw_probability=float(s['draw_probability']), 
                             experience_coeffs=dict(s['experience_coefficients']), 
@@ -201,7 +203,7 @@ def calculate():
         squads.append(squad_count)
 
     print("Rating the following:\n", ratings)
-    if env.quality(rating_groups=ratings) < 0.1:
+    if env.quality(rating_groups=ratings) < 0.5:
         flash('This match did not seem to be too fair...')
 
     try:

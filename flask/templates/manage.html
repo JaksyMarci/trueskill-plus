@@ -31,7 +31,17 @@
                 </div>
             </nav>
             <form method="POST">
-                <div class="form-group">
+                  <div class="form-group">
+                    <label for="mu">Mean value (mu)</label>
+                    <input type="number" min="0.0001" value={{session['env']['mu']}} step="0.0001" class="form-control" id="mu" name="mu" required>
+                    <small class="form-text">The default average rating of a player. This number represents an individual's skill.</small>
+                  </div>
+                  <div class="form-group">
+                    <label for="sigma">Variance value (sigma)</label>
+                    <input type="number" min="1" value={{session['env']['sigma']}} step="0.0001" class="form-control" id="sigma" name="sigma" required>
+                    <small class="form-text">The default variance of the rating of a player. Represents Trueskill's certainity in how accurate someone's skill rating is - lower means more certain. The recommended value is third of Mu.</small>
+                  </div>
+                  <div class="form-group">
                     <label for="beta">Beta value</label>
                     <input type="number" min="0.0001" value={{session['env']['beta']}} step="0.0001" class="form-control" id="beta" name="beta" required>
                     <small class="form-text">The distance which guarantees about 76% chance of winning. The recommended value is a half of sigma.</small>
