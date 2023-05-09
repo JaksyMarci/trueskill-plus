@@ -203,12 +203,14 @@ def calculate():
         squads.append(squad_count)
 
     print("Rating the following:\n", ratings)
-   
-    if env.quality(rating_groups=ratings) < 0.2:
- 
-        flash(f'This match did not seem to be too fair...',category='warning')
+    
+    
 
     try:
+        if env.quality(rating_groups=ratings) < 0.2:
+ 
+            flash(f'This match did not seem to be too fair...',category='warning')
+
         rated = env.rate(rating_groups=ratings, 
                      ranks=request.form['ranks'].split(','), 
                      stats=stats, 
