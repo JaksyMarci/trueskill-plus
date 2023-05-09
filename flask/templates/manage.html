@@ -37,7 +37,7 @@
                   </div>
                   <div class="form-group">
                     <label for="draw_probability">Draw probability</label>
-                    <input type="number" min="0.0001" max="0.9999" value={{session['env']['draw_probability']}} step="0.0001" class="form-control" id="draw_probability" name="draw_probability" required>
+                    <input type="number" min="0.0" max="0.9999" value={{session['env']['draw_probability']}} step="0.0001" class="form-control" id="draw_probability" name="draw_probability" required>
                     <small class="form-text">The draw probability between two teams. If it is a float, the game has fixed draw probability. Otherwise, the draw probability will be decided dynamically per each match.</small>
                   </div>
                   <div class="form-group">
@@ -58,7 +58,7 @@
                         {% for i in range(5):%}
                         <td>
 
-                           <input type="number" min="0.0" max="0.9999" value="0" step="0.0001" class="form-control" id="experience_coefficient_{{i}}" name="experience_{{i+1}}" required>
+                           <input type="number" min="0.0" max="0.9999" value={{session['experience_coefficients'][i+1]}} step="0.0001" class="form-control" id="experience_coefficient_{{i}}" name="experience_{{i+1}}" required>
                            
                         </td>
                         {%endfor%}
@@ -84,7 +84,7 @@
                         {% for i in range(5):%}
                         <td>
 
-                           <input type="number" min="0.0" max="0.9999" value="0" step="0.0001" class="form-control" id="squad_coefficient_{{i}}" name="squad_coefficient_{{i+1}}" required>
+                           <input type="number" min="0.0" max="0.9999" value={{session['squad_coefficients'][i+1]}} step="0.0001" class="form-control" id="squad_coefficient_{{i}}" name="squad_coefficient_{{i+1}}" required>
                            
                         </td>
                         {%endfor%}
