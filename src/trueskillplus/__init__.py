@@ -219,3 +219,5 @@ class Trueskillplus(trueskill.TrueSkill):
         
         return ts_plus_ratings
     
+    def quality(self, rating_groups, weights=None):
+        return super().quality(rating_groups, weights)

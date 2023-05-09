@@ -201,6 +201,9 @@ def calculate():
         squads.append(squad_count)
 
     print("Rating the following:\n", ratings)
+    if env.quality(rating_groups=ratings) < 0.1:
+        flash('This match did not seem to be too fair...')
+
     try:
         rated = env.rate(rating_groups=ratings, 
                      ranks=request.form['ranks'].split(','), 
@@ -273,14 +276,19 @@ def manage():
         
         return render_template('manage.html')
     
+@app.route('/graph', methods=['GET'])
+def graph():
+    return render_template('graph.html')
 
+@app.route('/help', methods=['GET'])
+def help():
+    return render_template('help.html')
 
 if __name__ == '__main__':
     app.run()
 
 
 """
-new data structure:
 session:
 {
     "teams" : {
@@ -300,17 +308,11 @@ session:
 
         "team2" : {},
         etc.
+    },
+    "env" : {
+        "mu" : 25,
+        ...
     }
 
 }
-player:
-
-"playerName" : {
-    "sigma" : "",
-    "mu" : "",
-    "experience" : "",
-    "isInSquad" : "",
-    etc.
-}
-
 """
