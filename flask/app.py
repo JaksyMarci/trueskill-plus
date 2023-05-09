@@ -208,8 +208,9 @@ def calculate():
                      expected_stats=expected_stats, 
                      squads=squads )
     
-    except:
+    except Exception as e:
         flash("Error determining ratings!")
+        flash(str(e))
         return render_template('main.html')
 
     

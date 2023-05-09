@@ -76,12 +76,13 @@ class Trueskillplus(trueskill.TrueSkill):
         if stats is not None and expected_stats is not None:
 
             if len(rating_groups) != len(stats) and len(rating_groups) != len(expected_stats):
-                logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
-                return None
+                
+                raise Exception("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
+                
             
             if not (all(len(item1) == len(item2) and len(item1) == len(item3) for item1, item2, item3 in zip(rating_groups, stats, expected_stats))):
-                logging.error("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
-                return None
+                raise Exception("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
+          
         else:
             stats = []
             expected_stats = []
@@ -90,8 +91,8 @@ class Trueskillplus(trueskill.TrueSkill):
         for i, team in enumerate(rating_groups[:-1]):
             next_team = rating_groups[i+1]
             if (len(team) != len(next_team)):
-                logging.error("N:M type of matches are not supported")
-                return None
+                raise Exception("N:M type of matches are not supported")
+             
 
 
         average_ratings = [] #average rating of i-th team
