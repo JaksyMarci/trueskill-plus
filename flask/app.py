@@ -239,14 +239,17 @@ def calculate():
     # make figure
     # MAY BE UNSAFE
     plt.clf()
-   
-    x_axis = np.arange(0, 50, 0.01)
+    labels = []
+    x_axis = np.arange(0, float(session['env']['mu']) * 2, 0.01)
     for teamName, teamMember in s.items():
         for teamMember, values in teamMember.items():
             # TODO invent some clever colors here
-            plt.plot(x_axis, norm.pdf(
+            plt.plot(x_axis, 100 * norm.pdf(
                 x_axis, values['mu'], values['sigma']), scalex=1.5, animated=True)
-
+            labels.append(teamMember)
+    plt.legend(labels)
+    plt.xlabel('Rating')
+    plt.ylabel('Probability of rating %')
     # Save it to a temporary buffer.
     buf = BytesIO()
     plt.savefig(buf, format="png")
