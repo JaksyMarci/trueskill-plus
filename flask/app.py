@@ -237,8 +237,8 @@ def calculate():
     for teams, teamMembers in s.items():
         for member, rating in teamMembers.items():
 
-            rating['mu'] = rated_flat[i].mu
-            rating['sigma'] = rated_flat[i].sigma
+            rating['mu'] = round(rated_flat[i].mu,4)
+            rating['sigma'] = round(rated_flat[i].sigma,4)
             i += 1
 
     
