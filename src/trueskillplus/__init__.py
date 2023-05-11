@@ -60,9 +60,9 @@ class Trueskillplus(trueskill.TrueSkill):
         delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
         sum_sigma = sum(r.sigma ** 2 for r in itertools.chain(team1, team2))
         size = len(team1) + len(team2)
-        denom = math.sqrt(size * (self.env.beta * self.env.beta) + sum_sigma)
+        denom = math.sqrt(size * (self.beta * self.beta) + sum_sigma)
 
-        return self.env.cdf(delta_mu / denom)
+        return self.cdf(delta_mu / denom)
 
     def rate(self, rating_groups : List[Tuple], ranks=None, weights=None, min_delta=0.001, stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : List = None):
       
@@ -115,6 +115,7 @@ class Trueskillplus(trueskill.TrueSkill):
         experiences = []
 
         
+
         for team_tuple, stat_tuple, expected_stat_tuple in zip(rating_groups, stats, expected_stats):
             new_team = []
             team_experiences = []
@@ -122,7 +123,9 @@ class Trueskillplus(trueskill.TrueSkill):
             for r, s, es in zip(team_tuple, stat_tuple, expected_stat_tuple):
                 
                 #caluclate individual statistics
-                stat_diff = s-es
+                stat_diff = abs(s-es)
+
+
                 rating_diff = abs(
                     r.mu - 
                     (sum(average_ratings[:i] + average_ratings[i+1:]) / len(average_ratings[:i] + average_ratings[i+1:]))
@@ -180,8 +183,7 @@ class Trueskillplus(trueskill.TrueSkill):
     #TODO: 
     def rate_1vs1(self, rating1 : Rating_plus, rating2 : Rating_plus, stats = None, expected_stats = None):
        
-        rating1 = Rating_plus(rating1.mu + rating1.mu * ((1 / rating1.experience + 1) * self.experience_coeff))
-        rating2 = Rating_plus(rating2.mu + rating2.mu * ((1 / rating2.experience + 1) * self.experience_coeff))
+        
 
 
         if stats is not None and expected_stats is not None:
