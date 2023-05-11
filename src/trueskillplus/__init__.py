@@ -114,7 +114,7 @@ class Trueskillplus(trueskill.TrueSkill):
         new_ratings = []
         experiences = []
 
-        print(rating_groups, '\n', stats, '\n', expected_stats, '\n')
+        
         for team_tuple, stat_tuple, expected_stat_tuple in zip(rating_groups, stats, expected_stats):
             new_team = []
             team_experiences = []
@@ -147,7 +147,7 @@ class Trueskillplus(trueskill.TrueSkill):
                     experience_offset = 0
 
      
-                print(r.mu, r.mu * squad_offset, r.mu * experience_offset, r.sigma + stat_offset)
+                
                 new_team.append(Rating_plus(r.mu +
                                             r.mu * squad_offset +
                                             r.mu * experience_offset,
@@ -164,7 +164,7 @@ class Trueskillplus(trueskill.TrueSkill):
             experiences.append(tuple(team_experiences))
             i+=1
 
-        print(new_ratings)
+     
 
         
 
