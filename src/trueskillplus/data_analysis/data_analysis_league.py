@@ -44,7 +44,7 @@ for tag in df['blueTeamTag'].unique():
     ts_plus_ratings[tag] = trueskill.Rating()
 
 ts_env = trueskill.TrueSkill(draw_probability=0)
-ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff = 0.00005)
+ts_plus_env = trueskillplus.Trueskillplus(draw_probability=0, stat_coeff = 0.000075)
 
 df['predicted_bResult'] = '?'
 
