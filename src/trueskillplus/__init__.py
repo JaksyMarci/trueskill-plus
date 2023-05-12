@@ -183,17 +183,22 @@ class Trueskillplus(trueskill.TrueSkill):
     #TODO: 
     def rate_1vs1(self, rating1 : Rating_plus, rating2 : Rating_plus, stats = None, expected_stats = None):
        
+        #stats is already a calculated difference between teams, not their individual scores. TODO beware, change this maybe
         
-        #TODO: stats nál vedd az abszolut erteket es feltetelezd hogy winner eseten nagyobvb a s tat!
 
         if stats is not None and expected_stats is not None:
+            stats = abs(stats)
+            expected_stats=abs(expected_stats)
             
             rating_diff = abs(rating1.mu - rating2.mu)
-            stat_diff = abs(stats-expected_stats)
+            stat_diff_winner = stats-expected_stats
+            stat_diff_loser = expected_stats - stats
             #we would need to know the relation between +1 rating <-> +how much stats. should be a 'hyperparamener'
             #TODO ditch this if it doesnt perform well
             #add coeffs for both values maybe?
-            stat_offset = max(0, (stat_diff / (rating_diff + 1)) *  self.stat_coeff)
+
+            stat_offset_winner = max(0, (stat_diff_winner / (rating_diff + 1)) *  self.stat_coeff)
+            stat_offset_loser = max(0, (stat_diff_loser / (rating_diff + 1)) *  self.stat_coeff)
            
             
         else:
@@ -202,8 +207,8 @@ class Trueskillplus(trueskill.TrueSkill):
             
             
         
-        rating1 = trueskill.Rating(rating1.mu, rating1.sigma + stat_offset)
-        rating2 = trueskill.Rating(rating2.mu, rating2.sigma + stat_offset) #large diff means an upset happened, so sigma gets modified
+        rating1 = trueskill.Rating(rating1.mu, rating1.sigma + stat_offset_winner)
+        rating2 = trueskill.Rating(rating2.mu, rating2.sigma + stat_offset_loser) #large diff means an upset happened, so sigma gets modified
         #add experience_offset to ratings here
         return trueskill.rate_1vs1(rating1, rating2)
     
