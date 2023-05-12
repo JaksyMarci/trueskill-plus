@@ -184,7 +184,7 @@ class Trueskillplus(trueskill.TrueSkill):
     def rate_1vs1(self, rating1 : Rating_plus, rating2 : Rating_plus, stats = None, expected_stats = None):
        
         
-
+        #TODO: stats nál vedd az abszolut erteket es feltetelezd hogy winner eseten nagyobvb a s tat!
 
         if stats is not None and expected_stats is not None:
             
@@ -193,7 +193,8 @@ class Trueskillplus(trueskill.TrueSkill):
             #we would need to know the relation between +1 rating <-> +how much stats. should be a 'hyperparamener'
             #TODO ditch this if it doesnt perform well
             #add coeffs for both values maybe?
-            stat_offset = (stat_diff / (rating_diff + 1)) *  self.stat_coeff
+            stat_offset = max(0, (stat_diff / (rating_diff + 1)) *  self.stat_coeff)
+           
             
         else:
             stat_offset = 0
