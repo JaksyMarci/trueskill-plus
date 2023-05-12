@@ -65,13 +65,14 @@ class Trueskillplus(trueskill.TrueSkill):
         return self.cdf(delta_mu / denom)
 
     def rate(self, rating_groups : List[Tuple], ranks=None, weights=None, min_delta=0.001, stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : List = None):
-      
+        
         super().validate_rating_groups(rating_groups)
         #TODO none lekezelés
         if (squads is None):
             squads = [1 for x in rating_groups]
 
-        
+        if ranks is None:
+            ranks = [i+1 for i in range(len(rating_groups))]
 
         if stats is not None and expected_stats is not None:
 
@@ -122,16 +123,19 @@ class Trueskillplus(trueskill.TrueSkill):
             
             for r, s, es in zip(team_tuple, stat_tuple, expected_stat_tuple):
                 
-                #caluclate individual statistics
-                stat_diff = abs(s-es)
-
-
+                
+                #new:
+                if ranks[i] <= len(rating_groups) / 2: #this team is considered a "winner"
+                    stat_diff = s-es
+                else:
+                    stat_diff = es-s
+                
                 rating_diff = abs(
                     r.mu - 
                     (sum(average_ratings[:i] + average_ratings[i+1:]) / len(average_ratings[:i] + average_ratings[i+1:]))
                 )
                
-                stat_offset = (stat_diff / (rating_diff + 1)) *  self.stat_coeff
+                stat_offset = max(0, (stat_diff / (rating_diff + 1)) *  self.stat_coeff)
                 
                 #calculate squad offset
                 if squads[i] in self.squad_coeffs:
