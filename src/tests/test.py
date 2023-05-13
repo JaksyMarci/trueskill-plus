@@ -27,7 +27,7 @@ p4 = trueskillplus.Rating_plus(25,25/3, 2)
 
 print('TS1 ratings: ',trueskill.rate(rating_groups=[(ts1_1,ts1_2),(ts1_3,ts1_4)]))
 
-print('TS2 ratings: ', env.rate(rating_groups=[(ts2_1,ts2_2),(ts2_3,ts2_4)], ranks=[1,2],stats=[(4,3),(2,2)], expected_stats=[(3,3),(2,2)], squads=[0,0]))
+print('TS2 ratings: ', env.rate(rating_groups=[(ts2_1,ts2_2),(ts2_3,ts2_4)], ranks=[1,2],stats=[(4,2),(3,1)], expected_stats=[(3,3),(2,2)], squads=[0,0]))
 
 
 
