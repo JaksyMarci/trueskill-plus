@@ -3,7 +3,7 @@ import math
 import itertools
 import sys
 import logging
-from trueskill import *
+
 from typing import List, Tuple
 
 sys.path.append('..')

@@ -29,8 +29,39 @@ print('TS1 ratings: ',trueskill.rate(rating_groups=[(ts1_1,ts1_2),(ts1_3,ts1_4)]
 
 print('TS2 ratings: ', env.rate(rating_groups=[(ts2_1,ts2_2),(ts2_3,ts2_4)], ranks=[1,2],stats=[(4,2),(3,1)], expected_stats=[(3,3),(2,2)], squads=[0,0]))
 
+#creating the environment
+env = trueskillplus.Trueskillplus(stat_coeff=0.1, 
+                                  squad_coeffs = {1:0, 2:0.05}, 
+                                  experience_coeffs={1:0.01, 2:0})
 
+#creating ratings
+r_1 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
+r_2 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
+r_3 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
+r_4 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
 
+#making the players play a match, and updating ratings
+new_ratings = env.rate(rating_groups=[(r_1,r_2),(r_3,r_4)], 
+                       ranks=[1,2])
+#display results
+print(new_ratings)
+print('###########')
+#creating the environment
+env = trueskillplus.Trueskillplus(stat_coeff=0.1, 
+                                  squad_coeffs = {1:0, 2:0.05}, 
+                                  experience_coeffs={1:0.01, 2:0})
 
+#creating ratings
+r_1 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
+r_2 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
+r_3 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
+r_4 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
 
-
+#making the players play a match, and updating ratings
+new_ratings = env.rate(rating_groups=[(r_1,r_2),(r_3,r_4)], 
+                       ranks=[1,2],
+                       stats=[(4,2),(3,1)], 
+                       expected_stats=[(3,3),(2,2)], 
+                       squads=[2,0])
+#display results
+print(new_ratings)

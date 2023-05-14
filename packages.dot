@@ -1,0 +1,16 @@
+digraph "packages" {
+rankdir=BT
+charset="utf-8"
+"trueskillplus" [color="black", label=<trueskillplus>, shape="box", style="solid"];
+"trueskillplus.data_analysis" [color="black", label=<trueskillplus.data_analysis>, shape="box", style="solid"];
+"trueskillplus.data_analysis.data_analysis_csgo" [color="black", label=<trueskillplus.data_analysis.data_analysis_csgo>, shape="box", style="solid"];
+"trueskillplus.data_analysis.data_analysis_league" [color="black", label=<trueskillplus.data_analysis.data_analysis_league>, shape="box", style="solid"];
+"trueskillplus.model" [color="black", label=<trueskillplus.model>, shape="box", style="solid"];
+"trueskillplus.model.game_model" [color="black", label=<trueskillplus.model.game_model>, shape="box", style="solid"];
+"trueskillplus.data_analysis.data_analysis_csgo" -> "trueskillplus" [arrowhead="open", arrowtail="none"];
+"trueskillplus.data_analysis.data_analysis_csgo" -> "trueskillplus.model" [arrowhead="open", arrowtail="none"];
+"trueskillplus.data_analysis.data_analysis_csgo" -> "trueskillplus.model.game_model" [arrowhead="open", arrowtail="none"];
+"trueskillplus.data_analysis.data_analysis_league" -> "trueskillplus" [arrowhead="open", arrowtail="none"];
+"trueskillplus.data_analysis.data_analysis_league" -> "trueskillplus.model" [arrowhead="open", arrowtail="none"];
+"trueskillplus.data_analysis.data_analysis_league" -> "trueskillplus.model.game_model" [arrowhead="open", arrowtail="none"];
+}

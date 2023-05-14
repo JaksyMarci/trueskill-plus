@@ -1,0 +1,25 @@
+digraph "classes" {
+rankdir=BT
+charset="utf-8"
+"trueskill.mathematics.Gaussian" [color="black", fontcolor="black", label=<{Gaussian|mu : float<br ALIGN="LEFT"/>pi : float<br ALIGN="LEFT"/>sigma : float<br ALIGN="LEFT"/>tau : float<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"trueskill.Rating" [color="black", fontcolor="black", label=<{Rating|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"trueskillplus.Rating_plus" [color="black", fontcolor="black", label=<{Rating_plus|experience : int<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"trueskill.TrueSkill" [color="black", fontcolor="black", label=<{TrueSkill|beta : float<br ALIGN="LEFT"/>draw_probability : float<br ALIGN="LEFT"/>mu : float<br ALIGN="LEFT"/>sigma : float<br ALIGN="LEFT"/>tau : float<br ALIGN="LEFT"/>|create_rating(mu, sigma)<br ALIGN="LEFT"/>expose(rating)<br ALIGN="LEFT"/>quality(rating_groups, weights)<br ALIGN="LEFT"/>rate(rating_groups, ranks, weights, min_delta)<br ALIGN="LEFT"/>validate_rating_groups(rating_groups)<br ALIGN="LEFT"/>validate_weights(weights, rating_groups, keys)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"trueskillplus.Trueskillplus" [color="black", fontcolor="black", label=<{Trueskillplus|experience_coeffs : dict<br ALIGN="LEFT"/>squad_coeffs : dict<br ALIGN="LEFT"/>stat_coeff : float<br ALIGN="LEFT"/>|quality(rating_groups, weights)<br ALIGN="LEFT"/>rate(rating_groups: List[Tuple], ranks, weights, min_delta, stats: List[Tuple], expected_stats: List[Tuple], squads: List)<br ALIGN="LEFT"/>rate_1vs1(rating1: Rating_plus, rating2: Rating_plus, stats, expected_stats)<br ALIGN="LEFT"/>to_trueskill_plus(rating_groups: List[Tuple], experiences: List[Tuple])<br ALIGN="LEFT"/>win_probability(team1, team2)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"builtins.int.denominator" [color="black", fontcolor="black", label=<{denominator|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"builtins.int.imag" [color="black", fontcolor="black", label=<{imag|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"builtins.int.numerator" [color="black", fontcolor="black", label=<{numerator|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"builtins.object" [color="black", fontcolor="black", label=<{object|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"builtins.int.real" [color="black", fontcolor="black", label=<{real|<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"builtins.type" [color="black", fontcolor="black", label=<{type|<br ALIGN="LEFT"/>|<I>mro</I>()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"builtins.int.denominator" -> "builtins.object" [arrowhead="empty", arrowtail="none"];
+"builtins.int.imag" -> "builtins.object" [arrowhead="empty", arrowtail="none"];
+"builtins.int.numerator" -> "builtins.object" [arrowhead="empty", arrowtail="none"];
+"builtins.int.real" -> "builtins.object" [arrowhead="empty", arrowtail="none"];
+"builtins.type" -> "builtins.object" [arrowhead="empty", arrowtail="none"];
+"trueskill.Rating" -> "trueskill.mathematics.Gaussian" [arrowhead="empty", arrowtail="none"];
+"trueskill.TrueSkill" -> "builtins.object" [arrowhead="empty", arrowtail="none"];
+"trueskill.mathematics.Gaussian" -> "builtins.object" [arrowhead="empty", arrowtail="none"];
+"trueskillplus.Rating_plus" -> "trueskill.Rating" [arrowhead="empty", arrowtail="none"];
+"trueskillplus.Trueskillplus" -> "trueskill.TrueSkill" [arrowhead="empty", arrowtail="none"];
+}
