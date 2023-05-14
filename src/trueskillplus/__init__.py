@@ -23,40 +23,38 @@ DELTA = 0.0001
 
 
 class Rating_plus(trueskill.Rating):
-    def __init__(self, mu=None, sigma=None, experience = 0):
+    def __init__(self, mu=None, sigma=None, experience=0):
         super().__init__(mu, sigma)
         self.experience = experience
-    
-
 
 
 class Trueskillplus(trueskill.TrueSkill):
-    def __init__(self, mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROBABILITY, experience_coeffs : dict = None, squad_coeffs : dict = None, stat_coeff = 1):
+    def __init__(self, mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROBABILITY, experience_coeffs: dict = None, squad_coeffs: dict = None, stat_coeff=1):
         super().__init__(mu, sigma, beta, tau, draw_probability)
-        
-        #todo: give env the following
-        #stat coeff: difference from the expected * how much should be the new sigma?
-        #default 1 -> new sigma is sigma + abs(stat_diff - expected_stat_diff) 
-        #todo this also shouldnt be a flat value
+
+        # todo: give env the following
+        # stat coeff: difference from the expected * how much should be the new sigma?
+        # default 1 -> new sigma is sigma + abs(stat_diff - expected_stat_diff)
+        # todo this also shouldnt be a flat value
         #
-        #squad coeff
-        #experience coeff (both add to mu)
+        # squad coeff
+        # experience coeff (both add to mu)
         self.stat_coeff = stat_coeff
         if experience_coeffs is None:
-            self.experience_coeffs = {0:0.005, 1:0.004, 2:0.002,3:0.001, 4:0.0, 5:0.0}
+            self.experience_coeffs = {
+                0: 0.005, 1: 0.004, 2: 0.002, 3: 0.001, 4: 0.0, 5: 0.0}
         else:
             self.experience_coeffs = experience_coeffs
         if squad_coeffs is None:
-            self.squad_coeffs = {1:0, 2:0.01, 3:0.02, 4:0.03, 5:0.05}  
+            self.squad_coeffs = {1: 0, 2: 0.01, 3: 0.02, 4: 0.03, 5: 0.05}
         else:
             self.squad_coeffs = squad_coeffs
-            #TODO validate this.
+            # TODO validate this.
 
-    
+    # Szervezd ezt ki egy külön modulba, kapja az env-et paraméterkén
 
+    def win_probability(self, team1, team2):
 
-    def win_probability(self, team1, team2): #Szervezd ezt ki egy külön modulba, kapja az env-et paraméterkén
-    
         delta_mu = sum(r.mu for r in team1) - sum(r.mu for r in team2)
         sum_sigma = sum(r.sigma ** 2 for r in itertools.chain(team1, team2))
         size = len(team1) + len(team2)
@@ -64,10 +62,10 @@ class Trueskillplus(trueskill.TrueSkill):
 
         return self.cdf(delta_mu / denom)
 
-    def rate(self, rating_groups : List[Tuple], ranks=None, weights=None, min_delta=0.001, stats : List[Tuple] = None, expected_stats : List[Tuple] = None, squads : List = None):
-        
+    def rate(self, rating_groups: List[Tuple], ranks=None, weights=None, min_delta=0.001, stats: List[Tuple] = None, expected_stats: List[Tuple] = None, squads: List = None):
+
         super().validate_rating_groups(rating_groups)
-        #TODO none lekezelés
+        # TODO none lekezelés
         if (squads is None):
             squads = [1 for x in rating_groups]
 
@@ -77,36 +75,34 @@ class Trueskillplus(trueskill.TrueSkill):
         if stats is not None and expected_stats is not None:
 
             if len(rating_groups) != len(stats) and len(rating_groups) != len(expected_stats):
-                
-                raise Exception("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
-                
-            
+
+                raise Exception(
+                    "Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
+
             if not (all(len(item1) == len(item2) and len(item1) == len(item3) for item1, item2, item3 in zip(rating_groups, stats, expected_stats))):
-                raise Exception("Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
-          
+                raise Exception(
+                    "Unable to validate - rating groups, stats and expected stats have different structures, or invalid data.")
+
         else:
             stats = []
             expected_stats = []
-            
 
         for i, team in enumerate(rating_groups[:-1]):
             next_team = rating_groups[i+1]
             if (len(team) != len(next_team)):
                 raise Exception("N:M type of matches are not supported")
-             
 
-
-        average_ratings = [] #average rating of i-th team
+        average_ratings = []  # average rating of i-th team
         for team_tuple in rating_groups:
-            
+
             team_avg = 0
             default_stat = []
             default_expected_stat = []
             for r in team_tuple:
-                team_avg+=r.mu
+                team_avg += r.mu
                 default_stat.append(0)
                 default_expected_stat.append(0)
-            
+
             stats.append(tuple(default_stat))
             expected_stats.append(tuple(default_expected_stat))
             average_ratings.append(team_avg / len(team_tuple))
@@ -115,121 +111,112 @@ class Trueskillplus(trueskill.TrueSkill):
         new_ratings = []
         experiences = []
 
-        
-
         for team_tuple, stat_tuple, expected_stat_tuple in zip(rating_groups, stats, expected_stats):
             new_team = []
             team_experiences = []
-            
+
             for r, s, es in zip(team_tuple, stat_tuple, expected_stat_tuple):
-                
-                
-                #new:
-                if ranks[i] <= len(rating_groups) / 2: #this team is considered a "winner"
+
+                # this team is considered a "winner"
+                if ranks[i] <= len(rating_groups) / 2:
                     stat_diff = s-es
                 else:
                     stat_diff = es-s
-                
+
                 rating_diff = abs(
-                    r.mu - 
-                    (sum(average_ratings[:i] + average_ratings[i+1:]) / len(average_ratings[:i] + average_ratings[i+1:]))
+                    r.mu -
+                    (sum(average_ratings[:i] + average_ratings[i+1:]) /
+                     len(average_ratings[:i] + average_ratings[i+1:]))
                 )
-               
-                stat_offset = max(0, (stat_diff / (rating_diff + 1)) *  self.stat_coeff)
-                
-                #calculate squad offset
+
+                stat_offset = max(
+                    0, (stat_diff / (rating_diff + 1)) * self.stat_coeff)
+
+                # calculate squad offset
                 if squads[i] in self.squad_coeffs:
                     squad_offset = float(self.squad_coeffs[squads[i]])
-                
+
                 else:
                     squad_offset = 0
 
-                #calculate experience offset
+                # calculate experience offset
                 if r.experience in self.experience_coeffs:
-                    experience_offset = float(self.experience_coeffs[r.experience])
+                    experience_offset = float(
+                        self.experience_coeffs[r.experience])
 
-                    
-                
                 else:
                     experience_offset = 0
 
-     
-                
                 new_team.append(Rating_plus(r.mu +
                                             r.mu * squad_offset +
                                             r.mu * experience_offset,
                                             r.sigma + stat_offset,
                                             r.experience))
-                team_experiences.append(r.experience) 
+                team_experiences.append(r.experience)
 
-                
-                #r : trueskillplus rating
-                #s : stat number
-                #es: expected stat
+                # r : trueskillplus rating
+                # s : stat number
+                # es: expected stat
 
             new_ratings.append(tuple(new_team))
             experiences.append(tuple(team_experiences))
-            i+=1
-
-     
-
-        
+            i += 1
 
         return self.to_trueskill_plus(super().rate(new_ratings, ranks, weights, DELTA), experiences)
 
-        
-        #N:N team match – [(r1, r2, r3), (r4, r5, r6)] - optimal
-        #N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)] - calculates with the average of the opposing teams, not ideal
+        # N:N team match – [(r1, r2, r3), (r4, r5, r6)] - optimal
+        # N:N:N multiple team match – [(r1, r2), (r3, r4), (r5, r6)] - calculates with the average of the opposing teams, not ideal
 
-        #N:M unbalanced match – [(r1,), (r2, r3, r4)] - unsupported.
-        #Free-for-all – [(r1,), (r2,), (r3,), (r4,)] # ffa is same as N:N:N
+        # N:M unbalanced match – [(r1,), (r2, r3, r4)] - unsupported.
+        # Free-for-all – [(r1,), (r2,), (r3,), (r4,)] # ffa is same as N:N:N
 
-    #TODO: 
-    def rate_1vs1(self, rating1 : Rating_plus, rating2 : Rating_plus, stats = None, expected_stats = None):
-       
-        #stats is already a calculated difference between teams, not their individual scores. TODO beware, change this maybe
-        
+    # TODO:
+
+    def rate_1vs1(self, rating1: Rating_plus, rating2: Rating_plus, stats=None, expected_stats=None):
+
+        # stats is already a calculated difference between teams, not their individual scores. TODO beware, change this maybe
 
         if stats is not None and expected_stats is not None:
             stats = abs(stats)
-            expected_stats=abs(expected_stats)
-            
+            expected_stats = abs(expected_stats)
+
             rating_diff = abs(rating1.mu - rating2.mu)
             stat_diff_winner = stats-expected_stats
             stat_diff_loser = expected_stats - stats
-            #we would need to know the relation between +1 rating <-> +how much stats. should be a 'hyperparamener'
-            #TODO ditch this if it doesnt perform well
-            #add coeffs for both values maybe?
+            # we would need to know the relation between +1 rating <-> +how much stats. should be a 'hyperparamener'
+            # TODO ditch this if it doesnt perform well
+            # add coeffs for both values maybe?
 
-            stat_offset_winner = max(0, (stat_diff_winner / (rating_diff + 1)) *  self.stat_coeff)
-            stat_offset_loser = max(0, (stat_diff_loser / (rating_diff + 1)) *  self.stat_coeff)
-           
-            
+            stat_offset_winner = max(
+                0, (stat_diff_winner / (rating_diff + 1)) * self.stat_coeff)
+            stat_offset_loser = max(
+                0, (stat_diff_loser / (rating_diff + 1)) * self.stat_coeff)
+
         else:
             stat_offset = 0
 
-            
-            
-        
-        rating1 = trueskill.Rating(rating1.mu, rating1.sigma + stat_offset_winner)
-        rating2 = trueskill.Rating(rating2.mu, rating2.sigma + stat_offset_loser) #large diff means an upset happened, so sigma gets modified
-        #add experience_offset to ratings here
+        rating1 = trueskill.Rating(
+            rating1.mu, rating1.sigma + stat_offset_winner)
+        # large diff means an upset happened, so sigma gets modified
+        rating2 = trueskill.Rating(
+            rating2.mu, rating2.sigma + stat_offset_loser)
+        # add experience_offset to ratings here
         return trueskill.rate_1vs1(rating1, rating2)
-    
-    def to_trueskill_plus(self, rating_groups : List[Tuple], experiences : List[Tuple] = None):
+
+    def to_trueskill_plus(self, rating_groups: List[Tuple], experiences: List[Tuple] = None):
         ts_plus_ratings = []
 
         for team, team_exp in zip(rating_groups, experiences):
             ts_plus_team = []
             for r, e in zip(team, team_exp):
                 if experiences:
-                    ts_plus_team.append(Rating_plus(r.mu,r.sigma, e))
+                    ts_plus_team.append(Rating_plus(r.mu, r.sigma, e))
                 else:
-                    ts_plus_team.append(Rating_plus(r.mu,r.sigma))
-            
+                    ts_plus_team.append(Rating_plus(r.mu, r.sigma))
+
             ts_plus_ratings.append(tuple(ts_plus_team))
-        
+
         return ts_plus_ratings
-    
+
     def quality(self, rating_groups, weights=None):
         return super().quality(rating_groups, weights)

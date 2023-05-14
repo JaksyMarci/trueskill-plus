@@ -210,21 +210,23 @@ def calculate():
     print("Rating the following:\n", ratings)
     
     
-
+    
     try:
         if env.quality(rating_groups=ratings) < 0.2:
  
-            flash(f'This match did not seem to be too fair...',category='warning')
+            flash(f'This match did not seem to be too fair...',category='info')
 
+        
         rated = env.rate(rating_groups=ratings, 
-                     ranks=request.form['ranks'].split(','), 
+                     ranks=[int(x) for x in request.form['ranks'].split(',')], 
                      stats=stats, 
                      expected_stats=expected_stats, 
                      squads=squads )
-    
+        
     except Exception as e:
         flash("Error determining ratings!", category='error')
         flash(str(e), category='error')
+       
         return render_template('main.html')
 
     
