@@ -1,6 +1,6 @@
-from trueskillplus.model import game_model
+
 import trueskill
-import trueskillplus
+
 import itertools
 import pandas as pd
 import math
@@ -13,9 +13,9 @@ import numpy as np
 ts2_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..\\..'))
 sys.path.insert(0, ts2_dir)
 
-print(sys.path)
 
-
+import trueskillplus
+from trueskillplus.model import game_model
 # pro csgo games from 2016-2020
 # source: https://www.kaggle.com/datasets/gabrieltardochi/counter-strike-global-offensive-matches?resource=download
 
