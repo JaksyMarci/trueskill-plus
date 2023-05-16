@@ -32,7 +32,7 @@ use('agg')  # MATPLOTLIB IS NOT THREAD SAFE.
 
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
-app.config["SESSION_TYPE"] = "filesystem" #TODO change this to null
+app.config["SESSION_TYPE"] = "filesystem" 
 Session(app)
 
 

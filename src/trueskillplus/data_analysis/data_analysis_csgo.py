@@ -1,3 +1,6 @@
+from trueskillplus.model import game_model
+import trueskill
+import trueskillplus
 import itertools
 import pandas as pd
 import math
@@ -7,22 +10,17 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-
 ts2_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..\\..'))
 sys.path.insert(0, ts2_dir)
 
 print(sys.path)
-
-import trueskillplus
-import trueskill
-
 
 
 # pro csgo games from 2016-2020
 # source: https://www.kaggle.com/datasets/gabrieltardochi/counter-strike-global-offensive-matches?resource=download
 
 
-#TODO: convert from t1-t2 to winner-loser format so placement of teams isnt relevant
+# TODO: convert from t1-t2 to winner-loser format so placement of teams isnt relevant
 """
 prepare dataset
 """
@@ -33,8 +31,8 @@ df = pd.read_csv('csgo_games.csv')[['team_1', 'team_2', 'winner', 't1_points', '
                                     't2_player1_dmr', 't2_player2_dmr', 't2_player3_dmr', 't2_player4_dmr', 't2_player5_dmr']]
 
 
-#DANGER! the dataset includes scores in a bo3 and bo5 format as well, not just singular matches. this could fuck up things, drop scores if it does.
-#if you dont want to use scores, you can use mfkin uhh 'dmr'
+# DANGER! the dataset includes scores in a bo3 and bo5 format as well, not just singular matches. this could fuck up things, drop scores if it does.
+# if you dont want to use scores, you can use mfkin uhh 'dmr'
 
 df['t1_avg_kdr'] = (df['t1_player1_kdr'] + df['t1_player2_kdr'] +
                     df['t1_player3_kdr'] + df['t1_player4_kdr'] + df['t1_player5_kdr']) / 5
@@ -61,10 +59,8 @@ keep_values_2 = value_counts_2[value_counts_2 >= 100].index.tolist()
 df = df[df['team_1'].isin(keep_values_1)]
 df = df[df['team_2'].isin(keep_values_2)]
 
-#filter out draws (not idal but draws are so rare it doesnt really matter)
+# filter out draws (not idal but draws are so rare it doesnt really matter)
 df = df[df['winner'] != 'draw']
-
-
 
 
 # prepare plot
@@ -81,8 +77,8 @@ ts_plus_ratings = {}
 
 is_bestof = []
 kdr_diff = []
-# assign initial ratings 
-#very inefficient but i dont want to fix it
+# assign initial ratings
+# very inefficient but i dont want to fix it
 for index, row in df.iterrows():
     x.append(index)
     if row['team_1'] not in ts_ratings:
@@ -93,11 +89,11 @@ for index, row in df.iterrows():
         ts_ratings[row['team_2']] = trueskill.Rating()
         ts_plus_ratings[row['team_2']] = trueskill.Rating()
 
-    if row['t1_points'] + row['t2_points'] < 16 :
+    if row['t1_points'] + row['t2_points'] < 16:
         is_bestof.append(True)
     else:
         is_bestof.append(False)
-    
+
     kdr_diff.append(row['t1_avg_kdr'] - row['t2_avg_kdr'])
 
 df['is_bestof'] = is_bestof
@@ -116,10 +112,12 @@ Calculate original trueskil ratings
 
 for index, row in df.iterrows():
 
-    p = ts_plus_env.win_probability(team1=[ts_ratings[row['team_1']]], team2=[ts_ratings[row['team_2']]]) #TODO danger, environments could be different. 
+    # TODO danger, environments could be different.
+    p = ts_plus_env.win_probability(team1=[ts_ratings[row['team_1']]], team2=[
+                                    ts_ratings[row['team_2']]])
     predictions.append('t1') if p > 0.5 else predictions.append('t2')
     probabilities.append(p)
-  
+
     if (row['winner'] == 't1'):
 
         t1_new_rating, t2_new_rating = ts_env.rate_1vs1(
@@ -136,7 +134,7 @@ for index, row in df.iterrows():
         ts_ratings[row['team_1']] = t1_new_rating
         ts_ratings[row['team_2']] = t2_new_rating
 
-    #needed for plot
+    # needed for plot
     mu_list = []
 
     for key, value in ts_ratings.items():
@@ -147,7 +145,7 @@ for index, row in df.iterrows():
 df['predicted_winner'] = predictions
 df['t1_win_probability'] = probabilities
 
-#needed for plot
+# needed for plot
 label_list = []
 for key, value in ts_ratings.items():
     label_list.append(key)
@@ -178,7 +176,6 @@ plt.close()
 """
 Caluclate Trueskill plus ratings:
 """
-from trueskillplus.model import game_model
 
 print(df.sample(5))
 ts_plus_model = game_model.train_csgo_model(df)
@@ -190,37 +187,38 @@ y = []
 predictions = []
 probabilities = []
 
-#TODO reusing the dataset is questionable
+# TODO reusing the dataset is questionable
 
 for index, row in df.iterrows():
 
-    p = ts_plus_env.win_probability(team1=[ts_plus_ratings[row['team_1']]], team2=[ts_plus_ratings[row['team_2']]]) #put it into team format as well
+    p = ts_plus_env.win_probability(team1=[ts_plus_ratings[row['team_1']]], team2=[
+                                    ts_plus_ratings[row['team_2']]])  # put it into team format as well
     predictions.append('t1') if p > 0.5 else predictions.append('t2')
     probabilities.append(p)
 
-    
     if (row['winner'] == 't1'):
-        pred_array = np.array([ row['t1_points'], row['t2_points'], 1.0, 0.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0, 
-                              ])
+        pred_array = np.array([row['t1_points'], row['t2_points'], 1.0, 0.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0,
+                               ])
         t1_new_rating, t2_new_rating = ts_plus_env.rate_1vs1(
-            rating1=ts_plus_ratings[row['team_1']], rating2=ts_plus_ratings[row['team_2']],
+            rating1=ts_plus_ratings[row['team_1']
+                                    ], rating2=ts_plus_ratings[row['team_2']],
             stats=row['kdr_diff'],
-            expected_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
-            )
+            expected_stats=ts_plus_model(np.reshape(pred_array, (1, 6)))
+        )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating
         ts_plus_ratings[row['team_2']] = t2_new_rating
 
     elif (row['winner'] == 't2'):
-        pred_array= np.array([ row['t1_points'], row['t2_points'], 0.0, 1.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0,
-                              ])
-        
+        pred_array = np.array([row['t1_points'], row['t2_points'], 0.0, 1.0, 1.0 if row['is_bestof'] == False else 0.0, 1.0 if row['is_bestof'] == True else 0.0,
+                               ])
+
         t2_new_rating, t1_new_rating = ts_plus_env.rate_1vs1(
-            rating1=ts_plus_ratings[row['team_2']], 
+            rating1=ts_plus_ratings[row['team_2']],
             rating2=ts_plus_ratings[row['team_1']],
             stats=row['kdr_diff'],
-            expected_stats=ts_plus_model(np.reshape(pred_array, (1,6)))
-            )
+            expected_stats=ts_plus_model(np.reshape(pred_array, (1, 6)))
+        )
 
         ts_plus_ratings[row['team_1']] = t1_new_rating
         ts_plus_ratings[row['team_2']] = t2_new_rating
