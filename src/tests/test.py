@@ -57,7 +57,7 @@ class Trueskill_plus_test(unittest.TestCase):
         self.assertEqual(env.squad_coeffs, {
             1: 0, 2: 0.01, 3: 0.02, 4: 0.03, 5: 0.05
         })
-        self.assertEqual(env.stat_coeff, 1)
+        self.assertEqual(env.stat_coeff, 0)
 
     def test_init_with_custom_values(self):
         experience_coeffs = {0: 0.01, 1: 0.008, 2: 0.006, 3: 0.004, 4: 0.002, 5: 0.0}
@@ -112,96 +112,95 @@ class Trueskill_plus_test(unittest.TestCase):
         ]
         actual_ts_plus_ratings = self.default_env.to_trueskill_plus(rating_groups, experiences)
         self.assertEqual(actual_ts_plus_ratings, expected_ts_plus_ratings)
-    """@unittest.skip("Skipping this test")
-    def test_skip(self):
-        # Skip this test
-        self.fail("This test should be skipped")
 
-    @unittest.expectedFailure
-    def test_expected_failure(self):
-        # Expected failure
-        self.assertEqual(2 + 2, 5)
+    def test_rate(self):
+        r1 = Rating_plus()
+        r2 = Rating_plus()
+        r3 = Rating_plus()
+        r4 = Rating_plus()
 
-    @unittest.skipIf(2 + 2 == 5, "Skipping this test if 2 + 2 equals 5")
-    def test_skip_if(self):
-        # Skip this test if a condition is met
-        self.fail("This test should be skipped if 2 + 2 equals 5")
+        (new_r1, new_r2), (new_r3, new_r4) = self.default_env.rate([(r1,r2),(r3,r4)])
 
-    @unittest.skipUnless(2 + 2 == 5, "Skipping this test unless 2 + 2 equals 5")
-    def test_skip_unless(self):
-        # Skip this test unless a condition is met
-        self.fail("This test should be skipped unless 2 + 2 equals 5")"""
+        self.assertEqual(new_r1, new_r2)
+        self.assertGreater(new_r1, new_r3)
+
+    def test_ranks(self): 
+        r1 = Rating_plus()
+        r2 = Rating_plus()
+        r3 = Rating_plus()
+        r4 = Rating_plus()
+
+        (new_r1, new_r2), (new_r3, new_r4) = self.default_env.rate([(r1,r2),(r3,r4)], ranks=[2,1])
+
+        self.assertEqual(new_r1, new_r2)
+        self.assertGreater(new_r3, new_r1) 
+
+    def test_stats(self):
+        env = Trueskillplus(stat_coeff=0.5)
+        r1 = Rating_plus()
+        r2 = Rating_plus()
+        r3 = Rating_plus()
+        r4 = Rating_plus()
+
+        (new_r1, new_r2), (new_r3, new_r4) = env.rate(rating_groups=[(r1,r2),(r3,r4)], stats=[(4,2),(3,1)], expected_stats=[(3,3),(3,3)])
+
+       
+        self.assertGreater(new_r1, new_r2)
+        self.assertGreater(new_r2, new_r3)
+        self.assertGreater(new_r3, new_r4)
+    
+    def test_squads(self):
+        env = Trueskillplus(squad_coeffs={1:0, 2:0.1})
+        
+        r1 = Rating_plus()
+        r2 = Rating_plus()
+        r3 = Rating_plus()
+        r4 = Rating_plus()
+
+        (new_r1, new_r2), (new_r3, new_r4) = env.rate(rating_groups=[(r1,r2),(r3,r4)], squads=[2,1])
+        (def_r1, def_r2), (def_r3, def_r4) = self.default_env.rate(rating_groups=[(r1,r2),(r3,r4)])
+       
+        self.assertGreater(new_r1, def_r1)
+        self.assertGreater(new_r3, def_r3)
+
+    def test_experience(self):
+        env = Trueskillplus(experience_coeffs={0:0.01, 1:0})
+        
+        r1 = Rating_plus(experience=0)
+        r2 = Rating_plus(experience=1)
+        r3 = Rating_plus(experience=0)
+        r4 = Rating_plus(experience=0)
+
+        (new_r1, new_r2), (new_r3, new_r4) = env.rate(rating_groups=[(r1,r2),(r3,r4)])
+        (def_r1, def_r2), (def_r3, def_r4) = self.default_env.rate(rating_groups=[(r1,r2),(r3,r4)])
+       
+        self.assertGreater(new_r1, new_r2)
+        self.assertEqual(new_r3, new_r4)
+        self.assertGreater(new_r1, def_r1)
+
+   
+    def test_exception(self):
+        r1 = Rating_plus()
+        r2 = Rating_plus()
+        r3 = Rating_plus()
+        r4 = Rating_plus()
+        self.assertRaises(Exception, self.default_env.rate, [(r1,r2,r3),(r4,)])
+        self.assertRaises(Exception, self.default_env.rate, [(),()])
+        self.assertRaises(Exception, self.default_env.rate, [(r1,),()])
+        self.assertRaises(Exception, self.default_env.rate, rating_groups=[(r1,r2),(r3,r4)], ranks=[1,2,3])
+        self.assertRaises(Exception, self.default_env.rate, rating_groups=[(r1,r2),(r3,r4)], ranks=[1])
+        self.assertRaises(Exception, self.default_env.rate, rating_groups=[(r1,r2),(r3,r4)], stats=[1], expected_stats=[1])
+        self.assertRaises(Exception, self.default_env.rate, rating_groups=[(r1,r2),(r3,r4)], stats=[1,2], expected_stats=[1])
+        self.assertRaises(Exception, self.default_env.rate, rating_groups=[(r1,r2),(r3,r4)], stats=[(1,2),(2,1)], expected_stats=[1])
+
 
 
 
 # Run the tests when the script is executed directly
 if __name__ == '__main__':
-    test_suite = unittest.TestLoader().loadTestsFromTestCase(Trueskill_plus_test)
+    tests = unittest.TestLoader().loadTestsFromTestCase(Trueskill_plus_test)
 
     # Create a test runner and run the suite
     runner = unittest.TextTestRunner()
-    runner.run(test_suite)
+    runner.run(tests)
 
-
-
-"""env = trueskillplus.Trueskillplus(stat_coeff=0.1, experience_coeffs={0:0.01, 1:0})
-
-ts1_1 = trueskill.trueskill.Rating()
-ts1_2 = trueskill.trueskill.Rating()
-ts1_3 = trueskill.trueskill.Rating()
-ts1_4 = trueskill.trueskill.Rating()
-
-
-
-
-
-ts2_1 = trueskillplus.Rating_plus(25,25/3, 1)
-ts2_2 = trueskillplus.Rating_plus(25,25/3, 1)
-ts2_3 = trueskillplus.Rating_plus(25,25/3, 1)
-ts2_4 = trueskillplus.Rating_plus(25,25/3, 1)
-
-p1 = trueskillplus.Rating_plus(25,25/3, 0)
-p2 = trueskillplus.Rating_plus(28,25/3, 1)
-p3 = trueskillplus.Rating_plus(23,25/3, 0)
-p4 = trueskillplus.Rating_plus(25,25/3, 2)
-
-print('TS1 ratings: ',trueskill.rate(rating_groups=[(ts1_1,ts1_2),(ts1_3,ts1_4)]))
-
-print('TS2 ratings: ', env.rate(rating_groups=[(ts2_1,ts2_2),(ts2_3,ts2_4)], ranks=[1,2],stats=[(4,2),(3,1)], expected_stats=[(3,3),(2,2)], squads=[0,0]))
-
-#creating the environment
-env = trueskillplus.Trueskillplus(stat_coeff=0.1, 
-                                  squad_coeffs = {1:0, 2:0.05}, 
-                                  experience_coeffs={1:0.01, 2:0})
-
-#creating ratings
-r_1 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
-r_2 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
-r_3 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
-r_4 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
-
-#making the players play a match, and updating ratings
-new_ratings = env.rate(rating_groups=[(r_1,r_2),(r_3,r_4)], 
-                       ranks=[1,2])
-#display results
-print(new_ratings)
-print('###########')
-#creating the environment
-env = trueskillplus.Trueskillplus(stat_coeff=0.1, 
-                                  squad_coeffs = {1:0, 2:0.05}, 
-                                  experience_coeffs={1:0.01, 2:0})
-
-#creating ratings
-r_1 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
-r_2 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=1)
-r_3 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
-r_4 = trueskillplus.Rating_plus(mu=25,sigma=25/3, experience=0)
-
-#making the players play a match, and updating ratings
-new_ratings = env.rate(rating_groups=[(r_1,r_2),(r_3,r_4)], 
-                       ranks=[1,2],
-                       stats=[(4,2),(3,1)], 
-                       expected_stats=[(3,3),(2,2)], 
-                       squads=[2,0])
-#display results
-print(new_ratings)"""
