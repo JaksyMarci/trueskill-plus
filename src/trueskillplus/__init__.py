@@ -206,16 +206,24 @@ class Trueskillplus(trueskill.TrueSkill):
     def to_trueskill_plus(self, rating_groups: List[Tuple], experiences: List[Tuple] = None):
         ts_plus_ratings = []
 
-        for team, team_exp in zip(rating_groups, experiences):
-            ts_plus_team = []
-            for r, e in zip(team, team_exp):
-                if experiences:
-                    ts_plus_team.append(Rating_plus(r.mu, r.sigma, e))
-                else:
-                    ts_plus_team.append(Rating_plus(r.mu, r.sigma))
 
-            ts_plus_ratings.append(tuple(ts_plus_team))
 
+        if experiences is not None:
+            for team, team_exp in zip(rating_groups, experiences):
+                ts_plus_team = []
+                for r, e in zip(team, team_exp):
+                    
+                        ts_plus_team.append(Rating_plus(r.mu, r.sigma, e))
+                   
+
+                ts_plus_ratings.append(tuple(ts_plus_team))
+        else:
+            for team in rating_groups:
+                ts_plus_team = []
+                for r in team:
+                        ts_plus_team.append(Rating_plus(r.mu, r.sigma))
+                ts_plus_ratings.append(tuple(ts_plus_team))
+            
         return ts_plus_ratings
 
     def quality(self, rating_groups, weights=None):
