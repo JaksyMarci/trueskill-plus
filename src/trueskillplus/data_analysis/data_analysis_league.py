@@ -78,6 +78,7 @@ for index, row in df.iterrows():
 
 plt.figure()
 plt.plot(x, y, label=label_list)
+plt.legend(loc='center left', bbox_to_anchor=(0.95, 0.5))
 plt.savefig('NALCS_trueskill')
 
 
@@ -145,7 +146,9 @@ for index, row in df.iterrows():
     y.append(mu_list)
 
 
+
 plt.plot(x, y, label=label_list)
+plt.legend(loc='center left', bbox_to_anchor=(0.95, 0.5))
 plt.savefig('NALCS_trueskill_plus')
 
 

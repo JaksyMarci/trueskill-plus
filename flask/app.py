@@ -19,7 +19,7 @@ import sys
 import logging
 sys.path.append("..")
 #from trueskill import Rating, rate, TrueSkill
-from src.trueskillplus import Rating_plus, Trueskillplus, rate
+from src.trueskillplus import Rating_plus, Trueskillplus
 logging.basicConfig(level=logging.INFO)
 
 # import method from sibling
@@ -84,7 +84,7 @@ def index():
 @app.route('/main', methods=['GET','POST'])
 def index_main():
     
-    #print("\nCurrent session: \n", dict(session.items()))
+    print("\nCurrent session: \n", dict(session.items()))
     return render_template('main.html')
 
 
@@ -94,8 +94,10 @@ def add_player():
     s = dict(session['teams'].items())
     
     team = request.form['team']
- 
-    playerName = request.form['playerName']
+    
+    playerName = str(request.form['playerName'])
+
+
     s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
     
     s[team][playerName]['mu'] = float(request.form['mu'])
@@ -162,6 +164,61 @@ def remove_team():
 
     return render_template('main.html')
 
+@app.route('/quality', methods=['POST'])
+def quality():
+
+    if 'env' in session:
+        s = session['env']
+        #TODO add mu and sigma
+        env = Trueskillplus(mu=float(s['mu']),
+                            sigma=float(s['sigma']),
+                            beta=float(s['beta']), 
+                            tau=float(s['tau']), 
+                            draw_probability=float(s['draw_probability']), 
+                            experience_coeffs=dict(s['experience_coefficients']), 
+                            squad_coeffs=dict(s['squad_coefficients']),
+                            stat_coeff=float(s['stat_coefficient']))
+    else:
+        env = Trueskillplus()
+
+    s = dict(session['teams'].items())
+   
+    ratings = []
+    stats = []
+    expected_stats = []
+    squads=[]
+    for teamName, teamMembers in s.items():
+        player_rating = []
+        player_stat = []
+        player_expected_stat = []
+        squad_count = 0
+        for member, rating in teamMembers.items():
+
+            player_rating.append(
+                Rating_plus(mu=float(rating['mu']), sigma=float(rating['sigma']), experience=float(rating['experience'])))
+            
+            player_stat.append(float(s[teamName][member]['stats']))
+            player_expected_stat.append(float(s[teamName][member]['pred_stats']))
+            if s[teamName][member]['squad'] == 'on':
+                squad_count+=1
+
+        ratings.append(tuple(player_rating))
+        stats.append(tuple(player_stat))
+        expected_stats.append(tuple(player_expected_stat))
+        squads.append(squad_count)
+    try:
+        quality = env.quality(rating_groups=ratings)
+        flash(message=f'This match has a {round(quality * 100,1)}% draw probability.')
+        if quality > 0.5:
+            flash('This is a great pairing!')
+        if quality < 0.2:
+            flash('This match is unfair.', category="warning")
+    except Exception as e:
+        flash("Error calculating quality!", category='error')
+        flash(str(e), category='error')
+
+    return render_template('main.html')
+    
 @app.route('/calculate', methods=['POST'])
 def calculate():
     print(request.form)

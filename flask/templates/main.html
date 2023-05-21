@@ -65,12 +65,17 @@
             {% endwith %}
 
             
-
+            
             <form action="/calculate" method="POST" id="calculate">
 
                 <label for="ranks" class="form-label">Rank of teams</label>
                 <input type="text" class="form-control" id="ranks" placeholder="1,2" value="1,2" name="ranks">
                 <button type="submit" class="btn btn-outline-dark">Update ratings</button>
+
+            </form>
+            <form action="/quality" method="POST" id="quality">
+
+                <button type="submit" class="btn btn-outline-dark">Calculate quality of match</button>
 
             </form>
 
@@ -135,7 +140,7 @@
                         <tr>
                             <form action="/update_player" method="post">
                                 <input type="hidden" name="team" value= "{{ teamName }}" >
-                                <input type="hidden" name="playerName" value={{ key }}>
+                                <input type="hidden" name="playerName" value="{{ key }}">
                                 <td> {{ key}} </td>
                                 <td> {{values['mu']}} </td>
                                 <td> {{values['sigma']}} </td>
