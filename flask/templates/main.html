@@ -114,10 +114,10 @@
                                         <input type="number" class="form-control" id="sigma" value={{session['env']['sigma']}} name="sigma" min="0.0" step="0.0001" readonly>
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control" id="stats" value="0" name="stats">
+                                        <input type="number" class="form-control" id="stats" value="0" name="stats" min="0.0" step="0.0001">
                                     </td>
                                     <td>
-                                        <input type="number" class="form-control" id="pred_stats" value="0"
+                                        <input type="number" class="form-control" id="pred_stats" value="0" min="0.0" step="0.0001"
                                             name="pred_stats">
                                     </td>
                                     <td>
@@ -137,7 +137,6 @@
                                     
                                         } button{
                                             margin: 4px;
-                                        
                                         }
 
                                         </style>

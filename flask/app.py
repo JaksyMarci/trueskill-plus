@@ -167,6 +167,8 @@ def update_player():
             s[team][playerName]['squad'] = 'on'
         else:
             s[team][playerName]['squad'] = 'off'
+        
+        flash('Player updated successfully', category='info')
 
     elif request.form['action'] == 'move_down':
         s = dict(session['teams'].items())
@@ -222,7 +224,7 @@ def update_player():
        
 
         
-    flash('Player updated successfully', category='info')
+    
     return render_template('main.html')
 
 
