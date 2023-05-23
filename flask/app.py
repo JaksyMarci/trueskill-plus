@@ -118,18 +118,21 @@ def add_player():
             s[team][playerName]['squad'] = 'off'
 
     elif request.form['action'] == 'load':
-        s = dict(session['teams'].items())
-        file = request.files['file']
-        team = request.form['team']
-        playerName = file.filename.removesuffix('.json')
-        playerdata = json.loads(file.stream.read())
+        try:
+            s = dict(session['teams'].items())
+            file = request.files['file']
+            team = request.form['team']
+            playerName = file.filename.removesuffix('.json')
+            playerdata = json.loads(file.stream.read())
 
-        s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
-        s[team][playerName]['mu'] = float(playerdata['mu'])
-        s[team][playerName]['sigma'] = float(playerdata['sigma'])
-        s[team][playerName]['stats'] = float(playerdata['stats'])
-        s[team][playerName]['pred_stats'] = float(playerdata['pred_stats'])
-        s[team][playerName]['experience'] = int(playerdata['experience'])
+            s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
+            s[team][playerName]['mu'] = float(playerdata['mu'])
+            s[team][playerName]['sigma'] = float(playerdata['sigma'])
+            s[team][playerName]['stats'] = float(playerdata['stats'])
+            s[team][playerName]['pred_stats'] = float(playerdata['pred_stats'])
+            s[team][playerName]['experience'] = int(playerdata['experience'])
+        except:
+            flash("Error reading this file", category="error")
     
     return render_template('main.html')
 
