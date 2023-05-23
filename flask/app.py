@@ -1,5 +1,8 @@
 
-from flask import Flask, render_template, request, session, flash
+import json
+import os
+import tempfile
+from flask import Flask, render_template, request, send_file, send_from_directory, session, flash
 from flask_session import Session
 
 import base64
@@ -33,6 +36,7 @@ use('agg')  # MATPLOTLIB IS NOT THREAD SAFE.
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
 app.config["SESSION_TYPE"] = "filesystem" 
+app.config['UPLOAD_FOLDER'] = f'{os.getcwd()}/files'
 Session(app)
 
 
@@ -91,25 +95,30 @@ def index_main():
 @app.route('/add_player', methods=['POST'])
 def add_player():
     #print(request.form)
-    s = dict(session['teams'].items())
-    
-    team = request.form['team']
-    
-    playerName = str(request.form['playerName'])
+    if request.form['action'] == 'add_player':
+
+        s = dict(session['teams'].items())
+        
+        team = request.form['team']
+        
+        playerName = str(request.form['playerName'])
 
 
-    s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
-    
-    s[team][playerName]['mu'] = float(request.form['mu'])
-    s[team][playerName]['sigma'] = float(request.form['sigma'])
-    s[team][playerName]['stats'] = float(request.form['stats'])
-    s[team][playerName]['pred_stats'] = float(request.form['pred_stats'])
-    s[team][playerName]['experience'] = int(request.form['experience'])
+        s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
+        
+        s[team][playerName]['mu'] = float(request.form['mu'])
+        s[team][playerName]['sigma'] = float(request.form['sigma'])
+        s[team][playerName]['stats'] = float(request.form['stats'])
+        s[team][playerName]['pred_stats'] = float(request.form['pred_stats'])
+        s[team][playerName]['experience'] = int(request.form['experience'])
 
-    if 'squad' in request.form:
-        s[team][playerName]['squad'] = 'on'
-    else:
-        s[team][playerName]['squad'] = 'off'
+        if 'squad' in request.form:
+            s[team][playerName]['squad'] = 'on'
+        else:
+            s[team][playerName]['squad'] = 'off'
+
+    elif request.form['action'] == 'load_player':
+        pass
     
     return render_template('main.html')
 
@@ -119,7 +128,7 @@ def add_player():
 @app.route('/update_player', methods=['POST'])
 def update_player():
     
-    print(request.form)
+    
     if request.form['action'] == 'remove':
 
         s = dict(session['teams'])
@@ -159,9 +168,26 @@ def update_player():
         except (ValueError, IndexError):
             flash("Cannot move this player down!", category='warning')
         
+    elif request.form['action'] == 'save':
+        s = dict(session['teams'].items())
         
+        team = request.form['team']
+     
+        playerName = request.form['playerName']
 
-        print(s)
+        data = dict(s[team][playerName])
+        print(data)
+    
+   
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, dir=f'{os.getcwd()}/files') as temp_file:
+            # Write the dictionary data to the temporary file
+            json.dump(data, temp_file)
+
+            # Send the temporary file to the user for download
+            print(temp_file.name)
+            temp_file.seek(0)
+            return send_file(path_or_file=temp_file.name, as_attachment=True, download_name=f'{ playerName.replace(" ", "_") }.json')
+        
     elif request.form['action'] == 'move_up':
         s = dict(session['teams'].items())
         

@@ -130,7 +130,11 @@
                                     <td>
                                         <label for="addPlayer" class="form-label"> </label>
                                         <input type="submit" id="addPlayer" class="form-control btn btn-primary"
-                                            value="Add player">
+                                            name="action" value="add_player">
+
+                                        <label for="loadPlayer" class="form-label"> </label>
+                                        <input type="submit" id="loadPlayer" class="form-control btn btn-primary bi bi-upload"
+                                            name="action" value="load_player">
                                     </td>
                                 </form>
                             </div>
@@ -159,20 +163,21 @@
                                     {% if values['squad'] == 'on' %} checked {%endif%}>
                                 </td>
                                 <td>
-                                    <button type="submit" class="btn btn-info" name="action" value="move_down">
-                                        <i class="bi bi-arrow-down"></i>
-                                    </button>
-
                                     <button type="submit" class="btn btn-info" name="action" value="move_up">
                                         <i class="bi bi-arrow-up"></i>
                                     </button>
-                                    <br>
                                     <button type="submit" class="btn btn-warning" name="action" value="update">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
-
+                                    <br>
+                                    <button type="submit" class="btn btn-info" name="action" value="move_down">
+                                        <i class="bi bi-arrow-down"></i>
+                                    </button>
                                     <button type="submit" class="btn btn-danger" name='action' value="remove">
                                         <i class="bi bi-trash"></i>
+                                    </button>
+                                    <button type="submit" class="btn btn-secondary" name='action' value="save">
+                                        <i class="bi bi-save"></i>
                                     </button>
                                 </td>
                             </form>
