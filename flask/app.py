@@ -95,7 +95,7 @@ def index_main():
 @app.route('/add_player', methods=['POST'])
 def add_player():
     #print(request.form)
-    if request.form['action'] == 'add_player':
+    if request.form['action'] == 'add':
 
         s = dict(session['teams'].items())
         
@@ -117,8 +117,19 @@ def add_player():
         else:
             s[team][playerName]['squad'] = 'off'
 
-    elif request.form['action'] == 'load_player':
-        pass
+    elif request.form['action'] == 'load':
+        s = dict(session['teams'].items())
+        file = request.files['file']
+        team = request.form['team']
+        playerName = file.filename.removesuffix('.json')
+        playerdata = json.loads(file.stream.read())
+
+        s[team][playerName] = {'mu': '', 'sigma': '', 'stats': '', 'pred_stats': '', 'experience': '', 'squad': ''}
+        s[team][playerName]['mu'] = float(playerdata['mu'])
+        s[team][playerName]['sigma'] = float(playerdata['sigma'])
+        s[team][playerName]['stats'] = float(playerdata['stats'])
+        s[team][playerName]['pred_stats'] = float(playerdata['pred_stats'])
+        s[team][playerName]['experience'] = int(playerdata['experience'])
     
     return render_template('main.html')
 
