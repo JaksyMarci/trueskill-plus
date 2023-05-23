@@ -129,9 +129,25 @@
                                     </td>
                                     <td>
                                         <button type="submit" id="addPlayer" class="form-control btn btn-primary" name="action" value="add">Add Player</button>
-                                        <input type="file" name="file"> 
+                                        <style>
+                                            input[type="file"] {
+                                            opacity: 0;
+                                            width: 0;
+                                            height: 0;
+                                    
+                                        } button{
+                                            margin: 4px;
+                                        
+                                        }
+
+                                        </style>
+                                        
+                                        <label>
+                                            <input type="file" name="file">
+                                            <i class="btn btn-secondary bi bi-upload"></i>Upload player file
+                                        </label>
                                         <button type="submit" id="loadPlayer" class="form-control btn btn-primary" name="action" value="load">
-                                            <i class="bi bi-upload"></i> Load Player
+                                             Load Player
                                         </button>
                                         
                                         
