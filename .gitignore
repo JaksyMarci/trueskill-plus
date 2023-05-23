@@ -5,3 +5,4 @@ src/trueskillplus/__pycache__/
 flask/__pycache__/app.cpython-311.pyc
 flask/flask_session/
 structure.py
+flask/files/*
