@@ -29,7 +29,7 @@ class Rating_plus(trueskill.Rating):
 
 
 class Trueskillplus(trueskill.TrueSkill):
-    def __init__(self, mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROBABILITY, experience_coeffs: dict = None, squad_coeffs: dict = None, stat_coeff=0):
+    def __init__(self, mu=MU, sigma=SIGMA, beta=BETA, tau=TAU, draw_probability=DRAW_PROBABILITY, experience_coeffs: dict = None, squad_coeffs: dict = None, stat_coeff=0 ):
         super().__init__(mu, sigma, beta, tau, draw_probability)
 
         # todo: give env the following

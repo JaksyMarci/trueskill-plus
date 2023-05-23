@@ -145,8 +145,47 @@ def update_player():
         else:
             s[team][playerName]['squad'] = 'off'
 
+    elif request.form['action'] == 'move_down':
+        s = dict(session['teams'].items())
+        
+        team = request.form['team']
+        print(s)
+        playerName = request.form['playerName']
+
+        temp = list(s)
+        try:
+            res = temp[temp.index(team) + 1]
+            s[res][playerName] = s[team].pop(playerName)
+        except (ValueError, IndexError):
+            flash("Cannot move this player down!", category='warning')
+        
+        
+
+        print(s)
+    elif request.form['action'] == 'move_up':
+        s = dict(session['teams'].items())
+        
+        team = request.form['team']
+        print(s)
+        playerName = request.form['playerName']
+
+        temp = list(s)
+        try:
+            res = temp[temp.index(team) -1]
+            s[res][playerName] = s[team].pop(playerName)
+        except (ValueError, IndexError):
+            flash("Cannot move this player up!", category='warning')
+        
+        
+
+        print(s)
+       
+
+        
     flash('Player updated successfully', category='info')
     return render_template('main.html')
+
+
 
 
 @app.route('/add_team', methods=['POST'])
