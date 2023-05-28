@@ -194,13 +194,8 @@ class Trueskill_plus_test(unittest.TestCase):
         self.assertRaises(Exception, self.default_env.rate, rating_groups=[(r1,r2),(r3,r4)], stats=[(1,2),(2,1)], expected_stats=[1])
 
 
-
-
-# Run the tests when the script is executed directly
 if __name__ == '__main__':
     tests = unittest.TestLoader().loadTestsFromTestCase(Trueskill_plus_test)
-
-    # Create a test runner and run the suite
     runner = unittest.TextTestRunner()
     runner.run(tests)
 

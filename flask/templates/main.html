@@ -105,7 +105,7 @@
                                 <form action="/add_player" method="POST" class="form-inline" id="my-form" enctype="multipart/form-data">
                                     <input type="hidden" class="form-control" name="team" value="{{ teamName }}">
                                     <td>
-                                        <input type="text" class="form-control" id="playerName" name="playerName">
+                                        <input type="text" class="form-control" id="playerName" name="playerName" required maxlength="40">
                                     </td>
                                     <td>
                                         <input type="number" class="form-control" id="mu" value={{session['env']['mu']}} name="mu" min="0.0" step="0.0001" readonly>

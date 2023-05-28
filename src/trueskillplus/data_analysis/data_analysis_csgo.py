@@ -1,4 +1,6 @@
 
+from trueskillplus.model import game_model
+import trueskillplus
 import trueskill
 
 import itertools
@@ -14,13 +16,9 @@ ts2_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..\\..'))
 sys.path.insert(0, ts2_dir)
 
 
-import trueskillplus
-from trueskillplus.model import game_model
 # pro csgo games from 2016-2020
 # source: https://www.kaggle.com/datasets/gabrieltardochi/counter-strike-global-offensive-matches?resource=download
 
-
-# TODO: convert from t1-t2 to winner-loser format so placement of teams isnt relevant
 """
 prepare dataset
 """
@@ -31,15 +29,14 @@ df = pd.read_csv('csgo_games.csv')[['team_1', 'team_2', 'winner', 't1_points', '
                                     't2_player1_dmr', 't2_player2_dmr', 't2_player3_dmr', 't2_player4_dmr', 't2_player5_dmr']]
 
 
-# DANGER! the dataset includes scores in a bo3 and bo5 format as well, not just singular matches. this could fuck up things, drop scores if it does.
-# if you dont want to use scores, you can use mfkin uhh 'dmr'
+# Warning! the dataset includes scores in a bo3 and bo5 format as well, not just singular matches.
 
 df['t1_avg_kdr'] = (df['t1_player1_kdr'] + df['t1_player2_kdr'] +
                     df['t1_player3_kdr'] + df['t1_player4_kdr'] + df['t1_player5_kdr']) / 5
 df['t2_avg_kdr'] = (df['t2_player1_kdr'] + df['t2_player2_kdr'] +
                     df['t2_player3_kdr'] + df['t2_player4_kdr'] + df['t2_player5_kdr']) / 5
 
-"""
+""" secondary parameter for measuring expected stats, not used.
 df['t1_avg_dmr'] = (df['t1_player1_dmr'] + df['t1_player2_dmr'] +
                     df['t1_player3_dmr'] + df['t1_player4_dmr'] + df['t1_player5_dmr']) / 5
 df['t2_avg_dmr'] = (df['t2_player1_dmr'] + df['t2_player2_dmr'] +
@@ -48,18 +45,17 @@ df['t2_avg_dmr'] = (df['t2_player1_dmr'] + df['t2_player2_dmr'] +
 
 
 # remove teams from the dataset that have less than 200 matches
-
 value_counts_1 = df['team_1'].value_counts()
 value_counts_2 = df['team_2'].value_counts()
 
 # get a list of values that meet the occurrence count threshold
 keep_values_1 = value_counts_1[value_counts_1 >= 100].index.tolist()
 keep_values_2 = value_counts_2[value_counts_2 >= 100].index.tolist()
-# filter the dataframe to only include rows where the fruit value is in the keep_values list
+# filter dataframe
 df = df[df['team_1'].isin(keep_values_1)]
 df = df[df['team_2'].isin(keep_values_2)]
 
-# filter out draws (not idal but draws are so rare it doesnt really matter)
+# filter out draws
 df = df[df['winner'] != 'draw']
 
 
@@ -78,7 +74,7 @@ ts_plus_ratings = {}
 is_bestof = []
 kdr_diff = []
 # assign initial ratings
-# very inefficient but i dont want to fix it
+
 for index, row in df.iterrows():
     x.append(index)
     if row['team_1'] not in ts_ratings:
@@ -112,7 +108,6 @@ Calculate original trueskil ratings
 
 for index, row in df.iterrows():
 
-    # TODO danger, environments could be different.
     p = ts_plus_env.win_probability(team1=[ts_ratings[row['team_1']]], team2=[
                                     ts_ratings[row['team_2']]])
     predictions.append('t1') if p > 0.5 else predictions.append('t2')
@@ -134,7 +129,7 @@ for index, row in df.iterrows():
         ts_ratings[row['team_1']] = t1_new_rating
         ts_ratings[row['team_2']] = t2_new_rating
 
-    # needed for plot
+    # this arr is needed for plot
     mu_list = []
 
     for key, value in ts_ratings.items():
@@ -168,7 +163,7 @@ df_tail = df.tail(-1000)
 num_matches = sum(df_tail['winner'] == df_tail['predicted_winner'])
 total_rows = len(df_tail)
 percent_matches = num_matches / total_rows * 100
-# initial value: 58,546%
+
 print(
     f'After removing the first 1000 rows and ratings converge, Trueskill correctly predicts the outcome {percent_matches}% of the time.')
 
@@ -177,7 +172,6 @@ plt.close()
 Caluclate Trueskill plus ratings:
 """
 
-print(df.sample(5))
 ts_plus_model = game_model.train_csgo_model(df)
 
 plt.figure(figsize=[20, 5], dpi=400)
@@ -186,8 +180,6 @@ y = []
 
 predictions = []
 probabilities = []
-
-# TODO reusing the dataset is questionable
 
 for index, row in df.iterrows():
 
