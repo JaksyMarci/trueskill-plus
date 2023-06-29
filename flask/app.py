@@ -1,5 +1,4 @@
 
-from src.trueskillplus import Rating_plus, Trueskillplus
 import json
 import os
 import tempfile
@@ -19,6 +18,7 @@ import logging
 sys.path.append("..")
 logging.basicConfig(level=logging.INFO)
 
+from src.trueskillplus import Rating_plus, Trueskillplus
 # import method from sibling
 # module
 
