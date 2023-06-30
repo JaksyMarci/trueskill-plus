@@ -51,11 +51,11 @@ value_counts_2 = df['team_2'].value_counts()
 # get a list of values that meet the occurrence count threshold
 keep_values_1 = value_counts_1[value_counts_1 >= 100].index.tolist()
 keep_values_2 = value_counts_2[value_counts_2 >= 100].index.tolist()
-# filter dataframe
+# filter
 df = df[df['team_1'].isin(keep_values_1)]
 df = df[df['team_2'].isin(keep_values_2)]
 
-# filter out draws
+# filter out draws - only 4 entries
 df = df[df['winner'] != 'draw']
 
 
