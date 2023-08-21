@@ -1,8 +1,13 @@
 *.pyc
-flask_session/
 flask/__pycache__/
 src/trueskillplus/__pycache__/
 flask/__pycache__/app.cpython-311.pyc
 flask/flask_session/
 structure.py
 flask/files/*
+bin/
+lib/
+lib64/
+pyvenv.cfg
+flask/flask_session/*
+lib64
